@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context antiJARLocking="true" path="/microcredit">
+  <Resource accessToUnderlyingConnectionAllowed="true" auth="Container" connectionProperties="SetBigStringTryClob=true" driverClassName="oracle.jdbc.OracleDriver" maxIdle="10" maxTotal="25" maxWaitMillis="10000" name="jdbc/mc" password="mc" type="javax.sql.DataSource" url="jdbc:oracle:thin:@localhost:1521:xe" username="mc"/>
+  <!--<Resource name="jdbc/mc"
+    auth="Container"
+    type="javax.sql.DataSource"
+    factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+    testWhileIdle="true"
+    testOnBorrow="true"
+    testOnReturn="false"
+    validationQuery="SELECT 1 from dual"
+    validationInterval="30000"
+    timeBetweenEvictionRunsMillis="5000"
+    maxActive="100"
+    maxIdle="20"
+    minIdle="2"
+    maxWait="10000"
+    initialSize="10"
+    removeAbandonedTimeout="60"
+    removeAbandoned="true"
+    logAbandoned="true"
+    minEvictableIdleTimeMillis="30000"
+    jmxEnabled="true"
+    jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer"
+    username="mc"
+    password="mc"
+    driverClassName="oracle.jdbc.OracleDriver"
+    url="jdbc:oracle:thin:@localhost:xe"/>-->
+</Context>

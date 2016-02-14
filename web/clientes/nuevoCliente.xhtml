@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <ui:include src="/menu/menuBar.xhtml"/>
+        <h:form>
+            <p:panel id="panel" header="Nuevo cliente" >
+                <p:panelGrid columns="2" >
+                    <p:outputLabel value="Primer nombre:"/><p:inputText id="primerNombre" value="#{cliente.primerNombre}" required="true"/>
+                    <p:outputLabel value="Segundo nombre:"/><p:inputText value="#{cliente.segundoNombre}"/>
+                    <p:outputLabel value="Primer apellido:"/><p:inputText value="#{cliente.primerApellido}" required="true"/>
+                    <p:outputLabel value="Segundo apellido:"/><p:inputText value="#{cliente.segundoApellido}"/>
+                    <p:outputLabel value="DPI:"/><p:inputText value="#{cliente.dpi}" required="true"/>
+                    <p:outputLabel value="Telefono:"/><p:inputText value="#{cliente.telefono}" required="true"/>
+                    <p:outputLabel value="Tipo de negocio:"/><p:inputText value="#{cliente.tipoNegocio}" required="true"/>
+                    <p:outputLabel value="Nit:"/><p:inputText value="#{cliente.nit}"/>
+                    <p:outputLabel value="Dirección:"/><p:inputText value="#{cliente.direccion}"/>
+                </p:panelGrid>
+                <p:spacer height="50px"/>
+                <p:commandButton value="Crear" action="#{cliente.ingresar()}" update="panel" resetValues="true"/>
+                <p:commandButton value="Limpiar">
+                    <p:ajax update="panel" resetValues="true" />
+                </p:commandButton>
+            </p:panel>
+        </h:form>
+    </h:body>
+</html>
+
