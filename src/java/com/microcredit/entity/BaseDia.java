@@ -13,6 +13,8 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -31,7 +33,6 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "BaseDia.findAll", query = "SELECT b FROM BaseDia b"),
     @NamedQuery(name = "BaseDia.findByMonto", query = "SELECT b FROM BaseDia b WHERE b.monto = :monto"),
     @NamedQuery(name = "BaseDia.findByFechaCreacion", query = "SELECT b FROM BaseDia b WHERE b.fechaCreacion = :fechaCreacion"),
-    @NamedQuery(name = "BaseDia.findByIdCartera", query = "SELECT b FROM BaseDia b WHERE b.idCartera = :idCartera"),
     @NamedQuery(name = "BaseDia.findByIdBaseDia", query = "SELECT b FROM BaseDia b WHERE b.idBaseDia = :idBaseDia")})
 public class BaseDia implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -42,14 +43,14 @@ public class BaseDia implements Serializable {
     @Column(name = "FECHA_CREACION")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCreacion;
-    @Basic(optional = false)
-    @Column(name = "ID_CARTERA")
-    private BigInteger idCartera;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id
     @Basic(optional = false)
     @Column(name = "ID_BASE_DIA")
     private BigDecimal idBaseDia;
+    @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
+    @ManyToOne(optional = false)
+    private Cartera idCartera;
 
     public BaseDia() {
     }
@@ -58,11 +59,10 @@ public class BaseDia implements Serializable {
         this.idBaseDia = idBaseDia;
     }
 
-    public BaseDia(BigDecimal idBaseDia, BigInteger monto, Date fechaCreacion, BigInteger idCartera) {
+    public BaseDia(BigDecimal idBaseDia, BigInteger monto, Date fechaCreacion) {
         this.idBaseDia = idBaseDia;
         this.monto = monto;
         this.fechaCreacion = fechaCreacion;
-        this.idCartera = idCartera;
     }
 
     public BigInteger getMonto() {
@@ -81,20 +81,20 @@ public class BaseDia implements Serializable {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public BigInteger getIdCartera() {
-        return idCartera;
-    }
-
-    public void setIdCartera(BigInteger idCartera) {
-        this.idCartera = idCartera;
-    }
-
     public BigDecimal getIdBaseDia() {
         return idBaseDia;
     }
 
     public void setIdBaseDia(BigDecimal idBaseDia) {
         this.idBaseDia = idBaseDia;
+    }
+
+    public Cartera getIdCartera() {
+        return idCartera;
+    }
+
+    public void setIdCartera(Cartera idCartera) {
+        this.idCartera = idCartera;
     }
 
     @Override

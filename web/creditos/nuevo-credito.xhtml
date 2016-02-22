@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      locale="es">
+    <h:head>
+        <script src="/resources/PrimeFacesLocales.js" type="text/javascript"></script>
+        <title>MicroCredit</title>
+    </h:head>
+    <h:body>
+        <ui:include src="/menu/menuBar.xhtml"/>
+        <h:form id="form">
+            <p:panel id="panel" header="Nuevo Credito" >
+                <p:panelGrid columns="2" >
+
+                    <p:outputLabel value="Cliente:" for="clientePojo" />
+                    <p:autoComplete id="clientePojo" value="#{creditoView.cliente}" completeMethod="#{creditoView.completarCliente}"
+                                    var="cli" itemLabel="#{cli.idCliente}" itemValue="#{cli}" converter="clienteConverter"  forceSelection="true" >
+                         <p:column>
+                             <h:outputText value="#{cli.idCliente} "/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{cli.primerNombre} " /><h:outputText value="#{cli.primerApellido}" />
+                        </p:column>
+                    </p:autoComplete>
+
+                    <p:outputLabel value="Numero de tarjeta:"/><p:inputText id="primerNombre" value="#{creditoView.credito.idCredito}" required="true"/>
+                    <p:outputLabel value="Monto prestado:"/><p:inputText value="#{creditoView.credito.monto}" required="true">
+                        <f:validateDoubleRange minimum="500" maximum="15000"/>
+                        <p:ajax listener="#{creditoView.calcularMontoAPagar()}" update="montoPagar,interes"/>
+                    </p:inputText>
+                    <p:outputLabel value="Interes:"/><p:inputText id="interes" value="#{creditoView.interes}" disabled="true"/>
+                    <p:outputLabel value="Monto a pagar:"/><p:inputText id="montoPagar" value="#{creditoView.montoAPagar}" disabled="true"/>
+                    <p:outputLabel for="popup" value="Fecha desembolso:"/><p:calendar id="popup" value="#{creditoView.credito.fechaDesembolso}" pattern="dd/MM/yyyy" required="true"/>
+                </p:panelGrid>
+                <p:spacer height="50px"/>
+                <p:commandButton value="Crear" action="#{creditoView.ingresarCredito()}" update="panel" resetValues="true"/>
+                <p:commandButton value="Limpiar">
+                    <p:ajax update="panel" resetValues="true" />
+                </p:commandButton>
+            </p:panel>
+        </h:form>
+    </h:body>
+</html>
+

@@ -11,26 +11,26 @@
     <h:body>
         <ui:include src="/menu/menuBar.xhtml"/>
         <h:form>
-            <p:dataTable id="basicDT" var="cliente" value="#{dtClientes.clientes}">
+            <p:dataTable id="basicDT" var="cli" value="#{cliente.service.clientes}">
                 <f:facet name="header">
                     Clientes
                 </f:facet>
                 <p:column headerText="Id">
-                    <h:outputText value="#{cliente.idCliente}" />
+                    <h:outputText value="#{cli.idCliente}" />
                 </p:column>
                 <p:column headerText="Nombre">
-                    <h:outputText value="#{cliente.primerNombre} " />
-                    <h:outputText value="#{cliente.segundoNombre}" />
+                    <h:outputText value="#{cli.primerNombre} " />
+                    <h:outputText value="#{cli.segundoNombre}" />
                 </p:column>
                 <p:column headerText="Apellidos">
-                    <h:outputText value="#{cliente.primerApellido} " />
-                    <h:outputText value="#{cliente.segundoApellido}" />
+                    <h:outputText value="#{cli.primerApellido} " />
+                    <h:outputText value="#{cli.segundoApellido}" />
                 </p:column>
                 <p:column headerText="Telefono">
-                    <h:outputText value="#{cliente.telefono}" />
+                    <h:outputText value="#{cli.telefono}" />
                 </p:column>
                 <p:column headerText="Negocio">
-                    <h:outputText value="#{cliente.tipoNegocio}" />
+                    <h:outputText value="#{cli.tipoNegocio}" />
                 </p:column>
             </p:dataTable>
         </h:form>

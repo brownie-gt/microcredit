@@ -12,14 +12,16 @@
             <p:menubar>
                 <p:submenu label="Clientes">
                     <p:menuitem value="Ver" outcome="/clientes/clientes" />
-                    <p:menuitem value="Nuevo" outcome="/clientes/nuevo" />
-                    <p:menuitem value="Editar" url="#" />
+                    <p:menuitem value="Nuevo" outcome="/clientes/nuevo-cliente" />
                 </p:submenu>
 
                 <p:submenu label="Creditos">
-                    <p:menuitem value="Ver" url="#" />
-                    <p:menuitem value="Nuvo" url="#" />
-                    <p:menuitem value="Editar" url="#" />
+                    <p:menuitem value="Ver" outcome="/creditos/creditos" />
+                    <p:menuitem value="Nuevo" outcome="/creditos/nuevo-credito"/>
+                </p:submenu>
+                
+                 <p:submenu label="Abonos">
+                    <p:menuitem value="Nuevo" outcome="/abonos/nuevo-abono"/>
                 </p:submenu>
 
                 <p:menuitem value="Cuadre" url="#"/>

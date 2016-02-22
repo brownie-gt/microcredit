@@ -51,6 +51,9 @@ public class Usuario implements Serializable {
     @Basic(optional = false)
     @Column(name = "ID_USUARIO")
     private String idUsuario;
+    @JoinColumn(name = "ID_PERFIL", referencedColumnName = "ID_PERFIL")
+    @ManyToOne(optional = false)
+    private PerfilUsuario idPerfil;
     @Basic(optional = false)
     @Column(name = "CLAVE")
     private String clave;
@@ -78,9 +81,6 @@ public class Usuario implements Serializable {
     private Date fechaModificacion;
     @Column(name = "ESTADO")
     private Short estado;
-    @JoinColumn(name = "ID_PERFIL", referencedColumnName = "ID_PERFIL")
-    @ManyToOne(optional = false)
-    private PerfilUsuario idPerfil;
     @OneToMany(mappedBy = "idUsuario")
     private List<Cartera> carteraList;
 
@@ -193,14 +193,6 @@ public class Usuario implements Serializable {
         this.estado = estado;
     }
 
-    public PerfilUsuario getIdPerfil() {
-        return idPerfil;
-    }
-
-    public void setIdPerfil(PerfilUsuario idPerfil) {
-        this.idPerfil = idPerfil;
-    }
-
     @XmlTransient
     public List<Cartera> getCarteraList() {
         return carteraList;
@@ -233,6 +225,14 @@ public class Usuario implements Serializable {
     @Override
     public String toString() {
         return "com.microcredit.entity.Usuario[ idUsuario=" + idUsuario + " ]";
+    }
+
+    public PerfilUsuario getIdPerfil() {
+        return idPerfil;
+    }
+
+    public void setIdPerfil(PerfilUsuario idPerfil) {
+        this.idPerfil = idPerfil;
     }
     
 }

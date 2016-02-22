@@ -8,6 +8,7 @@ package com.microcredit.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -27,14 +28,15 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author 30178037
  */
 @Entity
-@Table(name = "ABONO_PRESTAMO")
+@Table(name = "ABONO")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "AbonoPrestamo.findAll", query = "SELECT a FROM AbonoPrestamo a"),
-    @NamedQuery(name = "AbonoPrestamo.findByIdAbono", query = "SELECT a FROM AbonoPrestamo a WHERE a.idAbono = :idAbono"),
-    @NamedQuery(name = "AbonoPrestamo.findByMonto", query = "SELECT a FROM AbonoPrestamo a WHERE a.monto = :monto"),
-    @NamedQuery(name = "AbonoPrestamo.findByFechaAbono", query = "SELECT a FROM AbonoPrestamo a WHERE a.fechaAbono = :fechaAbono")})
-public class AbonoPrestamo implements Serializable {
+    @NamedQuery(name = "Abono.findAll", query = "SELECT a FROM Abono a"),
+    @NamedQuery(name = "Abono.findByIdAbono", query = "SELECT a FROM Abono a WHERE a.idAbono = :idAbono"),
+    @NamedQuery(name = "Abono.findByMonto", query = "SELECT a FROM Abono a WHERE a.monto = :monto"),
+    @NamedQuery(name = "Abono.findByFechaAbono", query = "SELECT a FROM Abono a WHERE a.fechaAbono = :fechaAbono")})
+public class Abono implements Serializable {
+
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id
@@ -48,18 +50,18 @@ public class AbonoPrestamo implements Serializable {
     @Column(name = "FECHA_ABONO")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaAbono;
-    @JoinColumn(name = "ID_PRESTAMO", referencedColumnName = "ID_PRESTAMO")
+    @JoinColumn(name = "ID_CREDITO", referencedColumnName = "ID_CREDITO")
     @ManyToOne(optional = false)
-    private Credito idPrestamo;
+    private Credito idCredito;
 
-    public AbonoPrestamo() {
+    public Abono() {
     }
 
-    public AbonoPrestamo(BigDecimal idAbono) {
+    public Abono(BigDecimal idAbono) {
         this.idAbono = idAbono;
     }
 
-    public AbonoPrestamo(BigDecimal idAbono, BigInteger monto, Date fechaAbono) {
+    public Abono(BigDecimal idAbono, BigInteger monto, Date fechaAbono) {
         this.idAbono = idAbono;
         this.monto = monto;
         this.fechaAbono = fechaAbono;
@@ -89,12 +91,12 @@ public class AbonoPrestamo implements Serializable {
         this.fechaAbono = fechaAbono;
     }
 
-    public Credito getIdPrestamo() {
-        return idPrestamo;
+    public Credito getIdCredito() {
+        return idCredito;
     }
 
-    public void setIdPrestamo(Credito idPrestamo) {
-        this.idPrestamo = idPrestamo;
+    public void setIdCredito(Credito idCredito) {
+        this.idCredito = idCredito;
     }
 
     @Override
@@ -107,10 +109,10 @@ public class AbonoPrestamo implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof AbonoPrestamo)) {
+        if (!(object instanceof Abono)) {
             return false;
         }
-        AbonoPrestamo other = (AbonoPrestamo) object;
+        Abono other = (Abono) object;
         if ((this.idAbono == null && other.idAbono != null) || (this.idAbono != null && !this.idAbono.equals(other.idAbono))) {
             return false;
         }
@@ -119,7 +121,7 @@ public class AbonoPrestamo implements Serializable {
 
     @Override
     public String toString() {
-        return "com.microcredit.entity.AbonoPrestamo[ idAbono=" + idAbono + " ]";
+        return "com.microcredit.entity.Abono[ idAbono=" + idAbono + " ]";
     }
-    
+
 }

@@ -47,9 +47,9 @@ public class Mora implements Serializable {
     @Column(name = "FECHA_CREACION")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCreacion;
-    @JoinColumn(name = "ID_PRESTAMO", referencedColumnName = "ID_PRESTAMO")
+    @JoinColumn(name = "ID_CREDITO", referencedColumnName = "ID_CREDITO")
     @ManyToOne(optional = false)
-    private Credito idPrestamo;
+    private Credito idCredito;
 
     public Mora() {
     }
@@ -88,12 +88,12 @@ public class Mora implements Serializable {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public Credito getIdPrestamo() {
-        return idPrestamo;
+    public Credito getIdCredito() {
+        return idCredito;
     }
 
-    public void setIdPrestamo(Credito idPrestamo) {
-        this.idPrestamo = idPrestamo;
+    public void setIdCredito(Credito idCredito) {
+        this.idCredito = idCredito;
     }
 
     @Override

@@ -7,7 +7,6 @@ package com.microcredit.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
@@ -35,60 +34,60 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Credito.findAll", query = "SELECT c FROM Credito c"),
-    @NamedQuery(name = "Credito.findByIdPrestamo", query = "SELECT c FROM Credito c WHERE c.idPrestamo = :idPrestamo"),
+    @NamedQuery(name = "Credito.findByIdCredito", query = "SELECT c FROM Credito c WHERE c.idCredito = :idCredito"),
     @NamedQuery(name = "Credito.findByMonto", query = "SELECT c FROM Credito c WHERE c.monto = :monto"),
     @NamedQuery(name = "Credito.findByFechaDesembolso", query = "SELECT c FROM Credito c WHERE c.fechaDesembolso = :fechaDesembolso")})
 public class Credito implements Serializable {
+    @JoinColumn(name = "ID_CLIENTE", referencedColumnName = "ID_CLIENTE")
+    @ManyToOne(optional = false)
+    private Cliente idCliente;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCredito")
+    private List<Mora> moraList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCredito")
+    private List<Abono> abonoList;
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id
     @Basic(optional = false)
-    @Column(name = "ID_PRESTAMO")
-    private BigDecimal idPrestamo;
+    @Column(name = "ID_CREDITO")
+    private BigDecimal idCredito;
     @Basic(optional = false)
     @Column(name = "MONTO")
-    private BigInteger monto;
+    private BigDecimal monto;
     @Basic(optional = false)
     @Column(name = "FECHA_DESEMBOLSO")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaDesembolso;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idPrestamo")
-    private List<Mora> moraList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idPrestamo")
-    private List<AbonoPrestamo> abonoPrestamoList;
-    @JoinColumn(name = "ID_RUTA", referencedColumnName = "ID_RUTA")
+    @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
     @ManyToOne(optional = false)
-    private Ruta idRuta;
-    @JoinColumn(name = "ID_CLIENTE", referencedColumnName = "ID_CLIENTE")
-    @ManyToOne(optional = false)
-    private Cliente idCliente;
+    private Cartera idCartera;
 
     public Credito() {
     }
 
-    public Credito(BigDecimal idPrestamo) {
-        this.idPrestamo = idPrestamo;
+    public Credito(BigDecimal idCredito) {
+        this.idCredito = idCredito;
     }
 
-    public Credito(BigDecimal idPrestamo, BigInteger monto, Date fechaDesembolso) {
-        this.idPrestamo = idPrestamo;
+    public Credito(BigDecimal idCredito, BigDecimal monto, Date fechaDesembolso) {
+        this.idCredito = idCredito;
         this.monto = monto;
         this.fechaDesembolso = fechaDesembolso;
     }
 
-    public BigDecimal getIdPrestamo() {
-        return idPrestamo;
+    public BigDecimal getIdCredito() {
+        return idCredito;
     }
 
-    public void setIdPrestamo(BigDecimal idPrestamo) {
-        this.idPrestamo = idPrestamo;
+    public void setIdCredito(BigDecimal idCredito) {
+        this.idCredito = idCredito;
     }
 
-    public BigInteger getMonto() {
+    public BigDecimal getMonto() {
         return monto;
     }
 
-    public void setMonto(BigInteger monto) {
+    public void setMonto(BigDecimal monto) {
         this.monto = monto;
     }
 
@@ -98,6 +97,39 @@ public class Credito implements Serializable {
 
     public void setFechaDesembolso(Date fechaDesembolso) {
         this.fechaDesembolso = fechaDesembolso;
+    }
+
+    public Cartera getIdCartera() {
+        return idCartera;
+    }
+
+    public void setIdCartera(Cartera idCartera) {
+        this.idCartera = idCartera;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (idCredito != null ? idCredito.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Credito)) {
+            return false;
+        }
+        Credito other = (Credito) object;
+        if ((this.idCredito == null && other.idCredito != null) || (this.idCredito != null && !this.idCredito.equals(other.idCredito))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "com.microcredit.entity.Credito[ idCredito=" + idCredito + " ]";
     }
 
     @XmlTransient
@@ -110,20 +142,12 @@ public class Credito implements Serializable {
     }
 
     @XmlTransient
-    public List<AbonoPrestamo> getAbonoPrestamoList() {
-        return abonoPrestamoList;
+    public List<Abono> getAbonoList() {
+        return abonoList;
     }
 
-    public void setAbonoPrestamoList(List<AbonoPrestamo> abonoPrestamoList) {
-        this.abonoPrestamoList = abonoPrestamoList;
-    }
-
-    public Ruta getIdRuta() {
-        return idRuta;
-    }
-
-    public void setIdRuta(Ruta idRuta) {
-        this.idRuta = idRuta;
+    public void setAbonoList(List<Abono> abonoList) {
+        this.abonoList = abonoList;
     }
 
     public Cliente getIdCliente() {
@@ -132,31 +156,6 @@ public class Credito implements Serializable {
 
     public void setIdCliente(Cliente idCliente) {
         this.idCliente = idCliente;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (idPrestamo != null ? idPrestamo.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Credito)) {
-            return false;
-        }
-        Credito other = (Credito) object;
-        if ((this.idPrestamo == null && other.idPrestamo != null) || (this.idPrestamo != null && !this.idPrestamo.equals(other.idPrestamo))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "com.microcredit.entity.Credito[ idPrestamo=" + idPrestamo + " ]";
     }
     
 }

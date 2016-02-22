@@ -3,7 +3,6 @@
   <persistence-unit name="mcPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>com.microcredit.entity.ReferenciaCliente</class>
-    <class>com.microcredit.entity.Ruta</class>
     <class>com.microcredit.entity.AbonoPrestamo</class>
     <class>com.microcredit.entity.BaseDia</class>
     <class>com.microcredit.entity.Cliente</class>
@@ -15,6 +14,7 @@
     <class>com.microcredit.entity.TipoGasto</class>
     <class>com.microcredit.entity.Mora</class>
     <class>com.microcredit.entity.Credito</class>
+    <class>com.microcredit.entity.Abono</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@localhost:1521:XE"/>

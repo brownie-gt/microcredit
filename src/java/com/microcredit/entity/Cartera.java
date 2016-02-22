@@ -8,6 +8,7 @@ package com.microcredit.entity;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -32,6 +33,12 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Cartera.findByIdCartera", query = "SELECT c FROM Cartera c WHERE c.idCartera = :idCartera"),
     @NamedQuery(name = "Cartera.findByNombre", query = "SELECT c FROM Cartera c WHERE c.nombre = :nombre")})
 public class Cartera implements Serializable {
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCartera")
+    private List<BaseDia> baseDiaList;
+    @OneToMany(mappedBy = "idCartera")
+    private List<Gasto> gastoList;
+    @OneToMany(mappedBy = "idCartera")
+    private List<Ruta> rutaList;
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -39,10 +46,8 @@ public class Cartera implements Serializable {
     private Short idCartera;
     @Column(name = "NOMBRE")
     private String nombre;
-    @OneToMany(mappedBy = "idCartera")
-    private List<Gasto> gastoList;
-    @OneToMany(mappedBy = "idCartera")
-    private List<Ruta> rutaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCartera")
+    private List<Credito> creditoList;
     @JoinColumn(name = "ID_USUARIO", referencedColumnName = "ID_USUARIO")
     @ManyToOne
     private Usuario idUsuario;
@@ -71,21 +76,12 @@ public class Cartera implements Serializable {
     }
 
     @XmlTransient
-    public List<Gasto> getGastoList() {
-        return gastoList;
+    public List<Credito> getCreditoList() {
+        return creditoList;
     }
 
-    public void setGastoList(List<Gasto> gastoList) {
-        this.gastoList = gastoList;
-    }
-
-    @XmlTransient
-    public List<Ruta> getRutaList() {
-        return rutaList;
-    }
-
-    public void setRutaList(List<Ruta> rutaList) {
-        this.rutaList = rutaList;
+    public void setCreditoList(List<Credito> creditoList) {
+        this.creditoList = creditoList;
     }
 
     public Usuario getIdUsuario() {
@@ -119,6 +115,33 @@ public class Cartera implements Serializable {
     @Override
     public String toString() {
         return "com.microcredit.entity.Cartera[ idCartera=" + idCartera + " ]";
+    }
+
+    @XmlTransient
+    public List<BaseDia> getBaseDiaList() {
+        return baseDiaList;
+    }
+
+    public void setBaseDiaList(List<BaseDia> baseDiaList) {
+        this.baseDiaList = baseDiaList;
+    }
+
+    @XmlTransient
+    public List<Gasto> getGastoList() {
+        return gastoList;
+    }
+
+    public void setGastoList(List<Gasto> gastoList) {
+        this.gastoList = gastoList;
+    }
+
+    @XmlTransient
+    public List<Ruta> getRutaList() {
+        return rutaList;
+    }
+
+    public void setRutaList(List<Ruta> rutaList) {
+        this.rutaList = rutaList;
     }
     
 }

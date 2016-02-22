@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context antiJARLocking="true" path="/microcredit">
-  <Resource accessToUnderlyingConnectionAllowed="true" auth="Container" connectionProperties="SetBigStringTryClob=true" driverClassName="oracle.jdbc.OracleDriver" maxIdle="10" maxTotal="25" maxWaitMillis="10000" name="jdbc/mc" password="mc" type="javax.sql.DataSource" url="jdbc:oracle:thin:@localhost:1521:xe" username="mc"/>
+<!--  <Resource accessToUnderlyingConnectionAllowed="true" auth="Container" connectionProperties="SetBigStringTryClob=true" driverClassName="oracle.jdbc.OracleDriver" maxIdle="10" maxTotal="25" maxWaitMillis="10000" name="jdbc/mc" password="mc" type="javax.sql.DataSource" url="jdbc:oracle:thin:@localhost:1521:xe" username="mc"/>-->
   <!--<Resource name="jdbc/mc"
     auth="Container"
     type="javax.sql.DataSource"

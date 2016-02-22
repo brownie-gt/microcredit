@@ -5,10 +5,8 @@
  */
 package test;
 
-import com.microcredit.dao.UsuarioDAO;
-import com.microcredit.db.DBConnection;
-import com.mircrodedit.dal.UsuarioDAL;
-import java.sql.Connection;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,26 +15,18 @@ import org.slf4j.LoggerFactory;
  * @author 30178037
  */
 public class Test {
+
     private static final Logger logger = LoggerFactory.getLogger(Test.class);
-    
+
+    static BigDecimal total;
+
     public static void main(String[] args) {
-
-        Connection conn = DBConnection.getConnection();
-        
-        UsuarioDAO usuario = new UsuarioDAO();
-        usuario.setClave("123abc");
-        usuario.setPrimerNombre("Brwayam");
-        usuario.setPrimerApellido("Molina");
-        usuario.setIdPerfil(1);
-        usuario.setDpi(new Long("2626195040101"));
-        usuario.setCorreo("brownie.gt@gmail.com");
-        
-        UsuarioDAL u = new UsuarioDAL();
-        int result = u.insert(usuario);
-        logger.info("insert: "+result);
-
+        BigDecimal monto = new BigDecimal(3500);
+        BigDecimal tasa = new BigDecimal(0.15);
+        BigDecimal interes = monto.multiply(tasa);
+        interes = interes.setScale(0, RoundingMode.HALF_EVEN);
+        logger.debug("interes: " + interes);
+        logger.debug("total: " + monto.add(interes));
     }
-    
-    
-    
+
 }

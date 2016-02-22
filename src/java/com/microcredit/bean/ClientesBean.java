@@ -5,25 +5,28 @@ import com.microcredit.entity.Cliente;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import javax.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ManagedBean(name = "dtClientes")
-@SessionScoped
+@ViewScoped
 public class ClientesBean {
 
+    @ManagedProperty("#{clientes}")
     private List<Cliente> clientes;
-    private Cliente clienteSeleccionado;
-    private EntityManager em;
     private static final Logger logger = LoggerFactory.getLogger(ClientesBean.class);
+
     public ClientesBean() {
+        logger.debug("ClientesBean() - constructor");
     }
-    
+
     @PostConstruct
-    public void init(){
-        em = JPA.getEntityManager();
+    public void init() {
+        EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
         clientes = em.createNamedQuery("Cliente.findAll", Cliente.class).getResultList();
         em.close();
@@ -38,12 +41,4 @@ public class ClientesBean {
         this.clientes = clientes;
     }
 
-    public Cliente getClienteSeleccionado() {
-        return clienteSeleccionado;
-    }
-
-    public void setClienteSeleccionado(Cliente clienteSeleccionado) {
-        this.clienteSeleccionado = clienteSeleccionado;
-    }
-    
 }

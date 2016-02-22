@@ -6,9 +6,7 @@
 package com.microcredit.entity;
 
 import java.io.Serializable;
-import java.util.List;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,10 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -33,6 +29,9 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Ruta.findByIdRuta", query = "SELECT r FROM Ruta r WHERE r.idRuta = :idRuta"),
     @NamedQuery(name = "Ruta.findByNombre", query = "SELECT r FROM Ruta r WHERE r.nombre = :nombre")})
 public class Ruta implements Serializable {
+    @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
+    @ManyToOne
+    private Cartera idCartera;
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -40,11 +39,6 @@ public class Ruta implements Serializable {
     private Short idRuta;
     @Column(name = "NOMBRE")
     private String nombre;
-    @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
-    @ManyToOne
-    private Cartera idCartera;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idRuta")
-    private List<Credito> creditoList;
 
     public Ruta() {
     }
@@ -67,23 +61,6 @@ public class Ruta implements Serializable {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public Cartera getIdCartera() {
-        return idCartera;
-    }
-
-    public void setIdCartera(Cartera idCartera) {
-        this.idCartera = idCartera;
-    }
-
-    @XmlTransient
-    public List<Credito> getCreditoList() {
-        return creditoList;
-    }
-
-    public void setCreditoList(List<Credito> creditoList) {
-        this.creditoList = creditoList;
     }
 
     @Override
@@ -109,6 +86,14 @@ public class Ruta implements Serializable {
     @Override
     public String toString() {
         return "com.microcredit.entity.Ruta[ idRuta=" + idRuta + " ]";
+    }
+
+    public Cartera getIdCartera() {
+        return idCartera;
+    }
+
+    public void setIdCartera(Cartera idCartera) {
+        this.idCartera = idCartera;
     }
     
 }

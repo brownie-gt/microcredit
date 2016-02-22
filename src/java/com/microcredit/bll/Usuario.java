@@ -47,7 +47,6 @@ public class Usuario {
         usuario = new com.microcredit.entity.Usuario();
         PerfilUsuario perfil = new PerfilUsuario();
         perfil.setIdPerfil(BigDecimal.valueOf(user.getIdPerfil()));
-        usuario.setIdPerfil(perfil);
         usuario.setPrimerNombre(user.getPrimerNombre());
         usuario.setIdUsuario(user.getUsuario());
         usuario.setClave(user.getClave());
