@@ -7,17 +7,17 @@ package com.microcredit.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -35,17 +35,19 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Abono.findByIdAbono", query = "SELECT a FROM Abono a WHERE a.idAbono = :idAbono"),
     @NamedQuery(name = "Abono.findByMonto", query = "SELECT a FROM Abono a WHERE a.monto = :monto"),
     @NamedQuery(name = "Abono.findByFechaAbono", query = "SELECT a FROM Abono a WHERE a.fechaAbono = :fechaAbono")})
+@SequenceGenerator(name = "ABONO_SEQ", sequenceName = "ABONO_SEQ", allocationSize = 1)
 public class Abono implements Serializable {
 
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id
     @Basic(optional = false)
+    @GeneratedValue(generator = "ABONO_SEQ")
     @Column(name = "ID_ABONO")
     private BigDecimal idAbono;
     @Basic(optional = false)
     @Column(name = "MONTO")
-    private BigInteger monto;
+    private BigDecimal monto;
     @Basic(optional = false)
     @Column(name = "FECHA_ABONO")
     @Temporal(TemporalType.TIMESTAMP)
@@ -61,7 +63,7 @@ public class Abono implements Serializable {
         this.idAbono = idAbono;
     }
 
-    public Abono(BigDecimal idAbono, BigInteger monto, Date fechaAbono) {
+    public Abono(BigDecimal idAbono, BigDecimal monto, Date fechaAbono) {
         this.idAbono = idAbono;
         this.monto = monto;
         this.fechaAbono = fechaAbono;
@@ -75,11 +77,11 @@ public class Abono implements Serializable {
         this.idAbono = idAbono;
     }
 
-    public BigInteger getMonto() {
+    public BigDecimal getMonto() {
         return monto;
     }
 
-    public void setMonto(BigInteger monto) {
+    public void setMonto(BigDecimal monto) {
         this.monto = monto;
     }
 
