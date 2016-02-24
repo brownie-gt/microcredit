@@ -7,6 +7,7 @@ package com.microcredit.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -37,6 +38,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Abono.findByFechaAbono", query = "SELECT a FROM Abono a WHERE a.fechaAbono = :fechaAbono")})
 @SequenceGenerator(name = "ABONO_SEQ", sequenceName = "ABONO_SEQ", allocationSize = 1)
 public class Abono implements Serializable {
+    @Basic(optional = false)
+    @Column(name = "MONTO")
+    private BigDecimal monto;
 
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
@@ -45,9 +49,6 @@ public class Abono implements Serializable {
     @GeneratedValue(generator = "ABONO_SEQ")
     @Column(name = "ID_ABONO")
     private BigDecimal idAbono;
-    @Basic(optional = false)
-    @Column(name = "MONTO")
-    private BigDecimal monto;
     @Basic(optional = false)
     @Column(name = "FECHA_ABONO")
     @Temporal(TemporalType.TIMESTAMP)
@@ -77,13 +78,6 @@ public class Abono implements Serializable {
         this.idAbono = idAbono;
     }
 
-    public BigDecimal getMonto() {
-        return monto;
-    }
-
-    public void setMonto(BigDecimal monto) {
-        this.monto = monto;
-    }
 
     public Date getFechaAbono() {
         return fechaAbono;
@@ -124,6 +118,14 @@ public class Abono implements Serializable {
     @Override
     public String toString() {
         return "com.microcredit.entity.Abono[ idAbono=" + idAbono + " ]";
+    }
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
+
+    public void setMonto(BigDecimal monto) {
+        this.monto = monto;
     }
 
 }

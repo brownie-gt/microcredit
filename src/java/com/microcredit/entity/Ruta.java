@@ -6,7 +6,9 @@
 package com.microcredit.entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -14,8 +16,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -29,6 +33,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Ruta.findByIdRuta", query = "SELECT r FROM Ruta r WHERE r.idRuta = :idRuta"),
     @NamedQuery(name = "Ruta.findByNombre", query = "SELECT r FROM Ruta r WHERE r.nombre = :nombre")})
 public class Ruta implements Serializable {
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idRuta")
+    private List<Credito> creditoList;
     @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
     @ManyToOne
     private Cartera idCartera;
@@ -94,6 +100,15 @@ public class Ruta implements Serializable {
 
     public void setIdCartera(Cartera idCartera) {
         this.idCartera = idCartera;
+    }
+
+    @XmlTransient
+    public List<Credito> getCreditoList() {
+        return creditoList;
+    }
+
+    public void setCreditoList(List<Credito> creditoList) {
+        this.creditoList = creditoList;
     }
     
 }

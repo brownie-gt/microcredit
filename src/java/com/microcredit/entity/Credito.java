@@ -7,6 +7,7 @@ package com.microcredit.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
@@ -38,6 +39,12 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Credito.findByMonto", query = "SELECT c FROM Credito c WHERE c.monto = :monto"),
     @NamedQuery(name = "Credito.findByFechaDesembolso", query = "SELECT c FROM Credito c WHERE c.fechaDesembolso = :fechaDesembolso")})
 public class Credito implements Serializable {
+    @Basic(optional = false)
+    @Column(name = "MONTO")
+    private BigDecimal monto;
+    @JoinColumn(name = "ID_RUTA", referencedColumnName = "ID_RUTA")
+    @ManyToOne(optional = false)
+    private Ruta idRuta;
     @JoinColumn(name = "ID_CLIENTE", referencedColumnName = "ID_CLIENTE")
     @ManyToOne(optional = false)
     private Cliente idCliente;
@@ -51,9 +58,6 @@ public class Credito implements Serializable {
     @Basic(optional = false)
     @Column(name = "ID_CREDITO")
     private BigDecimal idCredito;
-    @Basic(optional = false)
-    @Column(name = "MONTO")
-    private BigDecimal monto;
     @Basic(optional = false)
     @Column(name = "FECHA_DESEMBOLSO")
     @Temporal(TemporalType.TIMESTAMP)
@@ -83,13 +87,6 @@ public class Credito implements Serializable {
         this.idCredito = idCredito;
     }
 
-    public BigDecimal getMonto() {
-        return monto;
-    }
-
-    public void setMonto(BigDecimal monto) {
-        this.monto = monto;
-    }
 
     public Date getFechaDesembolso() {
         return fechaDesembolso;
@@ -156,6 +153,22 @@ public class Credito implements Serializable {
 
     public void setIdCliente(Cliente idCliente) {
         this.idCliente = idCliente;
+    }
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
+
+    public void setMonto(BigDecimal monto) {
+        this.monto = monto;
+    }
+
+    public Ruta getIdRuta() {
+        return idRuta;
+    }
+
+    public void setIdRuta(Ruta idRuta) {
+        this.idRuta = idRuta;
     }
     
 }
