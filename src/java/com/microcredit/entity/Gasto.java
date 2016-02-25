@@ -40,7 +40,7 @@ public class Gasto implements Serializable {
     private String idGasto;
     @Basic(optional = false)
     @Column(name = "FECHA_CREACION")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date fechaCreacion;
     @Basic(optional = false)
     @Column(name = "MONTO")

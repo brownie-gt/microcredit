@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Cuadre.findByBaseDia", query = "SELECT c FROM Cuadre c WHERE c.baseDia = :baseDia"),
     @NamedQuery(name = "Cuadre.findByEfectivo", query = "SELECT c FROM Cuadre c WHERE c.efectivo = :efectivo")})
 public class Cuadre implements Serializable {
+
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id
@@ -50,6 +51,8 @@ public class Cuadre implements Serializable {
     private BigDecimal cobroDia;
     @Column(name = "COBRADO")
     private BigDecimal cobrado;
+    @Column(name = "COBRO_COBRADOR")
+    private BigDecimal cobroCobrador;
     @Column(name = "BASE_DIA")
     private BigDecimal baseDia;
     @Column(name = "EFECTIVO")
@@ -97,6 +100,14 @@ public class Cuadre implements Serializable {
         this.cobrado = cobrado;
     }
 
+    public BigDecimal getCobroCobrador() {
+        return cobroCobrador;
+    }
+
+    public void setCobroCobrador(BigDecimal cobroCobrador) {
+        this.cobroCobrador = cobroCobrador;
+    }
+    
     public BigDecimal getBaseDia() {
         return baseDia;
     }
@@ -145,5 +156,5 @@ public class Cuadre implements Serializable {
     public String toString() {
         return "com.microcredit.entity.Cuadre[ idCuadre=" + idCuadre + " ]";
     }
-    
+
 }
