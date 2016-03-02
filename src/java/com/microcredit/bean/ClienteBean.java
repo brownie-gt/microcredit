@@ -8,7 +8,9 @@ package com.microcredit.bean;
 import com.microcredit.bll.ClienteService;
 import com.microcredit.bll.JPA;
 import com.microcredit.entity.Cliente;
+import com.microcredit.entity.ReferenciaCliente;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -28,28 +30,39 @@ public class ClienteBean implements Serializable {
 
     @ManagedProperty("#{clienteService}")
     private ClienteService service;
+    private List<Cliente> clientes;
     private Cliente cliente = new Cliente();
+    private ReferenciaCliente ref1;
+    private ReferenciaCliente ref2;
 
     private static final Logger logger = LoggerFactory.getLogger(ClienteBean.class);
 
     public ClienteBean() {
         logger.debug("ClienteBean() - constructor");
+        ref1 = new ReferenciaCliente();
+        ref2 = new ReferenciaCliente();
     }
 
-    public void ingresarCliente() {
-        logger.debug("ingresarCliente()*********");
+    public String ingresarCliente() {
+        List<ReferenciaCliente> referencias = new ArrayList<>();
+        ref1.setIdCliente(cliente);
+        ref2.setIdCliente(cliente);
+        referencias.add(ref1);
+        referencias.add(ref2);
+
+        cliente.setReferenciaClienteList(referencias);
+        cliente.setFechaCreacion(new Date());
+
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
-        cliente.setFechaCreacion(new Date());
         em.persist(cliente);
         em.getTransaction().commit();
         em.close();
         cliente = new Cliente();
         service.init();
         clientes = null;
+        return "/index";
     }
-
-    private List<Cliente> clientes;
 
     public List<Cliente> getClientes() {
         if (clientes == null) {
@@ -76,6 +89,22 @@ public class ClienteBean implements Serializable {
 
     public void setService(ClienteService service) {
         this.service = service;
+    }
+
+    public ReferenciaCliente getRef1() {
+        return ref1;
+    }
+
+    public void setRef1(ReferenciaCliente ref1) {
+        this.ref1 = ref1;
+    }
+
+    public ReferenciaCliente getRef2() {
+        return ref2;
+    }
+
+    public void setRef2(ReferenciaCliente ref2) {
+        this.ref2 = ref2;
     }
 
 }

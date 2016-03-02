@@ -8,8 +8,9 @@
     </h:head>
     <h:body>
         <h:form>  
-
             <p:menubar>
+                <p:menuitem value="Inicio" outcome="/index"/>
+
                 <p:submenu label="Clientes">
                     <p:menuitem value="Ver" outcome="/clientes/clientes" />
                     <p:menuitem value="Nuevo" outcome="/clientes/nuevo-cliente" />
@@ -19,8 +20,8 @@
                     <p:menuitem value="Ver" outcome="/creditos/creditos"/>
                     <p:menuitem value="Nuevo" outcome="/creditos/nuevo-credito"/>
                 </p:submenu>
-                
-                 <p:submenu label="Abonos">
+
+                <p:submenu label="Abonos">
                     <p:menuitem value="Nuevo" outcome="/abonos/nuevo-abono"/>
                 </p:submenu>
 
