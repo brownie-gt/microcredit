@@ -62,9 +62,9 @@ public class Credito implements Serializable {
     @Column(name = "FECHA_DESEMBOLSO")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaDesembolso;
-    @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
-    @ManyToOne(optional = false)
-    private Cartera idCartera;
+//    @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
+//    @ManyToOne(optional = false)
+//    private Cartera idCartera;
 
     public Credito() {
     }
@@ -96,13 +96,13 @@ public class Credito implements Serializable {
         this.fechaDesembolso = fechaDesembolso;
     }
 
-    public Cartera getIdCartera() {
-        return idCartera;
-    }
-
-    public void setIdCartera(Cartera idCartera) {
-        this.idCartera = idCartera;
-    }
+//    public Cartera getIdCartera() {
+//        return idCartera;
+//    }
+//
+//    public void setIdCartera(Cartera idCartera) {
+//        this.idCartera = idCartera;
+//    }
 
     @Override
     public int hashCode() {

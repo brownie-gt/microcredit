@@ -1,12 +1,66 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html">
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
     <h:head>
         <title>MicroCredit</title>
     </h:head>
     <h:body>
-        Hello from Facelets
+        <ui:include src="/menu/menuBar.xhtml"/>
+        <h:form>
+            <h:panelGrid columns="3">
+                <p:outputLabel value="Id cartera:"/><p:inputText value="#{cuadreView.idCartera}"/>
+                <p:commandButton value="Cargar" actionListener="#{cuadreView.cargarCarteraById()}" update="creditos">
+                    <f:actionListener binding="#{cuadreView.cargarCreditos(false)}" /></p:commandButton>
+            </h:panelGrid>
+            <p:spacer height=""/>
+            <p:dataTable id="creditos" var="c" value="#{cuadreView.creditosCuadre}">
+                <f:facet name="header">
+                    Creditos
+                </f:facet>
+                <p:column headerText="Fecha Desembolso" width="5%">
+                    <h:outputText value="#{c.credito.fechaDesembolso}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Ruta" width="10%">
+                    <h:outputText value="#{c.credito.idRuta.nombre}" />
+                </p:column>
+                <p:column headerText="Cliente" width="20%">
+                    <h:outputText value="#{c.credito.idCliente.primerNombre}" rendered="#{not empty c.credito.idCliente.primerNombre}"/>
+                    <h:outputText value="#{c.credito.idCliente.primerNombre}" rendered="#{not empty c.credito.idCliente.segundoNombre}"/>
+                    <h:outputText value=" #{c.credito.idCliente.primerApellido}" rendered="#{not empty c.credito.idCliente.primerApellido}"/>
+                    <h:outputText value="#{c.credito.idCliente.primerNombre}" rendered="#{not empty c.credito.idCliente.segundoApellido}"/>
+                </p:column>
+                <p:column headerText="Id Credito" width="5%">
+                    <h:outputText value="#{c.credito.idCredito}" />
+                </p:column>
+                <p:column headerText="Cuota" width="5%">
+                    <h:outputText value="#{c.cuota}" />
+                </p:column>
+                <p:column headerText="Abonos" width="5%">
+                    <h:outputText value="#{c.numeroAbonos}" />
+                </p:column>
+                <p:column headerText="Monto" width="5%">
+                    <h:outputText value="#{c.credito.monto}" />
+                </p:column>
+                <p:column headerText="Interes" width="5%">
+                    <h:outputText value="#{c.interes}" />
+                </p:column>
+                <p:column headerText="Abonado" width="5%">
+                    <h:outputText value="#{c.abonado}" />
+                </p:column>
+                <p:column headerText="Saldo por pagar" width="5%">
+                    <h:outputText value="#{c.saldoPorPagar}" />
+                </p:column>
+                <p:column headerText="Total a pagar" width="5%">
+                    <h:outputText value="#{c.totalAPagar}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
     </h:body>
 </html>
 

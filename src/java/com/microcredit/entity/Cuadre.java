@@ -11,11 +11,13 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -42,10 +44,12 @@ public class Cuadre implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id
     @Basic(optional = false)
+    @GeneratedValue(generator = "CUADRE_SEQ")
+    @SequenceGenerator(name = "CUADRE_SEQ", sequenceName = "CUADRE_SEQ", allocationSize = 1)
     @Column(name = "ID_CUADRE")
     private BigDecimal idCuadre;
     @Column(name = "FECHA_CREACION")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date fechaCreacion;
     @Column(name = "COBRO_DIA")
     private BigDecimal cobroDia;
@@ -57,6 +61,10 @@ public class Cuadre implements Serializable {
     private BigDecimal baseDia;
     @Column(name = "EFECTIVO")
     private BigDecimal efectivo;
+//    @Column(name = "FALTANTE")
+//    private BigDecimal faltante;
+//    @Column(name = "SOBRANTE")
+//    private BigDecimal sobrante;
     @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
     @ManyToOne
     private Cartera idCartera;
@@ -107,7 +115,7 @@ public class Cuadre implements Serializable {
     public void setCobroCobrador(BigDecimal cobroCobrador) {
         this.cobroCobrador = cobroCobrador;
     }
-    
+
     public BigDecimal getBaseDia() {
         return baseDia;
     }
@@ -115,6 +123,22 @@ public class Cuadre implements Serializable {
     public void setBaseDia(BigDecimal baseDia) {
         this.baseDia = baseDia;
     }
+
+//    public BigDecimal getFaltante() {
+//        return faltante;
+//    }
+//
+//    public void setFaltante(BigDecimal faltante) {
+//        this.faltante = faltante;
+//    }
+//
+//    public BigDecimal getSobrante() {
+//        return sobrante;
+//    }
+//
+//    public void setSobrante(BigDecimal sobrante) {
+//        this.sobrante = sobrante;
+//    }
 
     public BigDecimal getEfectivo() {
         return efectivo;

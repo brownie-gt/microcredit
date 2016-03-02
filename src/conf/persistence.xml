@@ -15,6 +15,7 @@
     <class>com.microcredit.entity.Mora</class>
     <class>com.microcredit.entity.Credito</class>
     <class>com.microcredit.entity.Abono</class>
+    <class>com.microcredit.entity.Cuadre</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@localhost:1521:XE"/>

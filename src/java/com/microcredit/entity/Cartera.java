@@ -48,11 +48,11 @@ public class Cartera implements Serializable {
     private Short idCartera;
     @Column(name = "NOMBRE")
     private String nombre;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCartera")
-    private List<Credito> creditoList;
-    @JoinColumn(name = "ID_USUARIO", referencedColumnName = "ID_USUARIO")
-    @ManyToOne
-    private Usuario idUsuario;
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCartera")
+//    private List<Credito> creditoList;
+//    @JoinColumn(name = "ID_USUARIO", referencedColumnName = "ID_USUARIO")
+//    @ManyToOne
+//    private Usuario idUsuario;
 
     public Cartera() {
     }
@@ -77,22 +77,22 @@ public class Cartera implements Serializable {
         this.nombre = nombre;
     }
 
-    @XmlTransient
-    public List<Credito> getCreditoList() {
-        return creditoList;
-    }
-
-    public void setCreditoList(List<Credito> creditoList) {
-        this.creditoList = creditoList;
-    }
-
-    public Usuario getIdUsuario() {
-        return idUsuario;
-    }
-
-    public void setIdUsuario(Usuario idUsuario) {
-        this.idUsuario = idUsuario;
-    }
+//    @XmlTransient
+//    public List<Credito> getCreditoList() {
+//        return creditoList;
+//    }
+//
+//    public void setCreditoList(List<Credito> creditoList) {
+//        this.creditoList = creditoList;
+//    }
+//
+//    public Usuario getIdUsuario() {
+//        return idUsuario;
+//    }
+//
+//    public void setIdUsuario(Usuario idUsuario) {
+//        this.idUsuario = idUsuario;
+//    }
 
     @Override
     public int hashCode() {

@@ -6,15 +6,18 @@
 package com.microcredit.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -33,9 +36,12 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Gasto.findByFechaCreacion", query = "SELECT g FROM Gasto g WHERE g.fechaCreacion = :fechaCreacion"),
     @NamedQuery(name = "Gasto.findByMonto", query = "SELECT g FROM Gasto g WHERE g.monto = :monto")})
 public class Gasto implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
+    @GeneratedValue(generator = "GASTO_SEQ")
+    @SequenceGenerator(name = "GASTO_SEQ", sequenceName = "GASTO_SEQ", allocationSize = 1)
     @Column(name = "ID_GASTO")
     private String idGasto;
     @Basic(optional = false)
@@ -44,7 +50,7 @@ public class Gasto implements Serializable {
     private Date fechaCreacion;
     @Basic(optional = false)
     @Column(name = "MONTO")
-    private double monto;
+    private BigDecimal monto;
     @JoinColumn(name = "ID_TIPO_GASTO", referencedColumnName = "ID_TIPO_GASTO")
     @ManyToOne(optional = false)
     private TipoGasto idTipoGasto;
@@ -59,7 +65,7 @@ public class Gasto implements Serializable {
         this.idGasto = idGasto;
     }
 
-    public Gasto(String idGasto, Date fechaCreacion, double monto) {
+    public Gasto(String idGasto, Date fechaCreacion, BigDecimal monto) {
         this.idGasto = idGasto;
         this.fechaCreacion = fechaCreacion;
         this.monto = monto;
@@ -81,11 +87,11 @@ public class Gasto implements Serializable {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public double getMonto() {
+    public BigDecimal getMonto() {
         return monto;
     }
 
-    public void setMonto(double monto) {
+    public void setMonto(BigDecimal monto) {
         this.monto = monto;
     }
 
@@ -129,5 +135,5 @@ public class Gasto implements Serializable {
     public String toString() {
         return "com.microcredit.entity.Gasto[ idGasto=" + idGasto + " ]";
     }
-    
+
 }

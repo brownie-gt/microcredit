@@ -1,127 +1,162 @@
 package com.microcredit.bean;
 
+import com.microcredit.bll.ClienteService;
 import com.microcredit.bll.JPA;
-import com.microcredit.entity.Abono;
+import com.microcredit.bll.Utils;
+import com.microcredit.dao.DetalleCredito;
 import com.microcredit.entity.Cartera;
 import com.microcredit.entity.Cliente;
 import com.microcredit.entity.Credito;
-import com.microcredit.entity.Mora;
 import com.microcredit.entity.Ruta;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.RequestScoped;
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ManagedBean(name = "creditoView")
-@SessionScoped
-public class CreditoBean implements Serializable {
+@RequestScoped
+public class CreditoBean extends DetalleCredito implements Serializable {
 
-    private Credito credito;
+    private Short idCartera;
+    private List<Credito> creditos;
     private BigDecimal idCredito;
-    private BigDecimal monto;
-    private final BigDecimal tasa;
-    private BigDecimal interes;
-    private BigDecimal montoAPagar;
-    private List<Mora> moraList;
-    private Ruta idRuta;
+//    private List<Mora> moraList;
+    private Ruta ruta;
+    private List<Ruta> rutas;
     private Cliente cliente;
-
-    private List<Abono> abonoList;
-    private int abonoCount;
-    private BigDecimal abonado;
-    private BigDecimal saldoPorPagar;
+    private BigDecimal montoAbonar;
+    private Date fechaAbono;
 
     @ManagedProperty("#{clienteService}")
     private ClienteService service;
-    @ManagedProperty("#{creditoService}")
-    private CreditoService creditoService;
+
     private static final Logger logger = LoggerFactory.getLogger(CreditoBean.class);
 
     public CreditoBean() {
         logger.debug("CreditoBean()");
-        this.tasa = new BigDecimal(0.15);
-        this.credito = new Credito();
+    }
+
+    @PostConstruct
+    public void init() {
+        cargarRutas();
+        setCredito(new Credito());
     }
 
     public void ingresarCredito() {
         logger.debug("ingresarCredito()");
-        Cartera cartera = new Cartera();
-        cartera.setIdCartera(Short.valueOf("1"));
+
         Credito c = new Credito();
-//        c.setIdCredito(idCredito);
-//        c.setIdCartera(cartera);
-//        c.setIdCliente(cliente);
-//        c.setMonto(monto);
-//        c.setFechaDesembolso(fechaDesembolso);
-
-        c.setIdCredito(credito.getIdCredito());
-        c.setIdCartera(cartera);
+        c.setIdCredito(getCredito().getIdCredito());
         c.setIdCliente(cliente);
-        c.setMonto(credito.getIdCredito());
-        c.setFechaDesembolso(credito.getFechaDesembolso());
-
+        c.setIdRuta(ruta);
+        c.setMonto(getCredito().getMonto());
+        c.setFechaDesembolso(Utils.parsearFecha(getCredito().getFechaDesembolso()));
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
         em.persist(c);
         em.getTransaction().commit();
         em.close();
+//        creditoService.init();
 
-        creditoService.init();
+        limpiar();
     }
-
-    public void calcularMontoAPagar() {
-        if (monto != null && monto.intValue() > 0) {
-            interes = monto.multiply(tasa).setScale(0, RoundingMode.HALF_EVEN);
-            montoAPagar = monto.add(interes).setScale(0, RoundingMode.HALF_EVEN);
-            logger.debug("monto: " + monto);
-            logger.debug("interes: " + interes);
-            logger.debug("montoPagar: " + montoAPagar);
-        }
-    }
-
-    public void creditoById() {
-        logger.debug("creditoById()");
-        logger.debug("idCredito: " + idCredito);
+    
+    public void cargarCreditos(){
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
-        credito = em.find(Credito.class, idCredito);
-        logger.debug("c.getAbonoList().size(): " + credito.getAbonoList().size());
-        logger.debug("c.getAbonoList(): " + credito.getAbonoList());
+        creditos = em.createNamedQuery("Credito.findAll", Credito.class).getResultList();
         em.close();
-        abonoCount = credito.getAbonoList().size();
-        for(Abono a : credito.getAbonoList()){
+    }
+
+    @Override
+    public void limpiar() {
+        super.limpiar();
+        cliente = null;
+        ruta = null;
+        montoAbonar = null;
+        idCredito = null;
+    }
+
+    public void cargarCreditoById() {
+        logger.debug("cargarCredito()");
+        logger.debug("idCredito: " + idCredito);
+
+        EntityManager em = JPA.getEntityManager();
+        em.getTransaction().begin();
+        Credito c = em.find(Credito.class, idCredito);
+        em.close();
+        if (c != null) {
+            setCredito(c);
+            calcularDetalleCredito();
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Credito invalido."));
         }
+    }
+
+    public static List<Credito> getCreditosByDate(Cartera cartera, Date fecha) {
+        EntityManager em = JPA.getEntityManager();
+        em.getTransaction().begin();
+        /**
+         * Improve CarteraID filter needs to be added
+         */
+        List<Credito> result = em.createNamedQuery("Credito.findByFechaDesembolso", Credito.class).
+                setParameter("fechaDesembolso", Utils.parsearFecha(fecha)).getResultList();
+        em.close();
+        List<Credito> creditos = new ArrayList<>();
+        for (Credito c : result) {
+            if (c.getIdRuta().getIdCartera().getIdCartera().compareTo(cartera.getIdCartera()) == 0) {
+                creditos.add(c);
+            }
+        }
+        return creditos;
+    }
+
+    public void ingresarAbono() {
+        cargarCreditoById();
+        AbonoBean.ingresarAbono(getCredito(), montoAbonar, fechaAbono);
+        cargarCreditoById();
+        montoAbonar = null;
+        fechaAbono = null;
     }
 
     public List<Cliente> completarCliente(String query) {
         List<Cliente> allClientes = service.getClientes();
         List<Cliente> filteredClientes = new ArrayList<>();
-        for (Cliente cliente : allClientes) {
-            if ((cliente.getPrimerNombre() != null && cliente.getPrimerNombre().toLowerCase().contains(query)
-                    || cliente.getPrimerApellido().toLowerCase().contains(query))
-                    || cliente.getIdCliente().toString().startsWith(query)) {
-                filteredClientes.add(cliente);
+        for (Cliente c : allClientes) {
+            if ((c.getPrimerNombre() != null && c.getPrimerNombre().toLowerCase().contains(query))
+                    || (c.getPrimerApellido() != null && c.getPrimerApellido().toLowerCase().contains(query))
+                    || c.getIdCliente().toString().startsWith(query)) {
+                filteredClientes.add(c);
             }
         }
         return filteredClientes;
     }
 
-    public List<Credito> completarCredito(String query) {
-        List<Credito> allCreditos = creditoService.getCreditos();
-        List<Credito> filteredCreditos = new ArrayList<>();
-        for (Credito c : allCreditos) {
-            if (c.getIdCredito().toString().startsWith(query)) {
-                filteredCreditos.add(c);
+    public List<Ruta> completarRuta(String query) {
+        List<Ruta> filteredRutas = new ArrayList<>();
+        for (Ruta r : rutas) {
+            if (r.getNombre() != null && r.getNombre().toLowerCase().contains(query)) {
+                filteredRutas.add(r);
             }
         }
-        return filteredCreditos;
+        return filteredRutas;
+    }
+
+    private void cargarRutas() {
+        EntityManager em = JPA.getEntityManager();
+        em.getTransaction().begin();
+        rutas = em.createNamedQuery("Ruta.findAll", Ruta.class).getResultList();
+        em.close();
     }
 
     public BigDecimal getIdCredito() {
@@ -132,20 +167,19 @@ public class CreditoBean implements Serializable {
         this.idCredito = idCredito;
     }
 
-    public List<Mora> getMoraList() {
-        return moraList;
+//    public List<Mora> getMoraList() {
+//        return moraList;
+//    }
+//
+//    public void setMoraList(List<Mora> moraList) {
+//        this.moraList = moraList;
+//    }
+    public Ruta getRuta() {
+        return ruta;
     }
 
-    public void setMoraList(List<Mora> moraList) {
-        this.moraList = moraList;
-    }
-
-    public Ruta getIdRuta() {
-        return idRuta;
-    }
-
-    public void setIdRuta(Ruta idRuta) {
-        this.idRuta = idRuta;
+    public void setRuta(Ruta ruta) {
+        this.ruta = ruta;
     }
 
     public Cliente getCliente() {
@@ -156,76 +190,47 @@ public class CreditoBean implements Serializable {
         this.cliente = cliente;
     }
 
-    public List<Abono> getAbonoList() {
-        return abonoList;
-    }
-
-    public void setAbonoList(List<Abono> abonoList) {
-        this.abonoList = abonoList;
-    }
-
-    public BigDecimal getMonto() {
-        return monto;
-    }
-
-    public void setMonto(BigDecimal monto) {
-        this.monto = monto;
-    }
-
-    public BigDecimal getInteres() {
-        return interes;
-    }
-
-    public void setInteres(BigDecimal interes) {
-        this.interes = interes;
-    }
-
-    public BigDecimal getMontoAPagar() {
-        return montoAPagar;
-    }
-
-    public void setMontoAPagar(BigDecimal montoAPagar) {
-        this.montoAPagar = montoAPagar;
-    }
-
     public void setService(ClienteService service) {
         this.service = service;
     }
 
-    public void setCreditoService(CreditoService creditoService) {
-        this.creditoService = creditoService;
+    public BigDecimal getMontoAbonar() {
+        return montoAbonar;
     }
 
-    public Credito getCredito() {
-        return credito;
+    public void setMontoAbonar(BigDecimal montoAbonar) {
+        this.montoAbonar = montoAbonar;
     }
 
-    public void setCredito(Credito credito) {
-        this.credito = credito;
+    public List<Ruta> getRutas() {
+        return rutas;
     }
 
-    public int getAbonoCount() {
-        return abonoCount;
+    public void setRutas(List<Ruta> rutas) {
+        this.rutas = rutas;
     }
 
-    public void setAbonoCount(int abonoCount) {
-        this.abonoCount = abonoCount;
+    public Date getFechaAbono() {
+        return fechaAbono;
     }
 
-    public BigDecimal getAbonado() {
-        return abonado;
+    public void setFechaAbono(Date fechaAbono) {
+        this.fechaAbono = fechaAbono;
     }
 
-    public void setAbonado(BigDecimal abonado) {
-        this.abonado = abonado;
+    public Short getIdCartera() {
+        return idCartera;
     }
 
-    public BigDecimal getSaldoPorPagar() {
-        return saldoPorPagar;
+    public void setIdCartera(Short idCartera) {
+        this.idCartera = idCartera;
     }
 
-    public void setSaldoPorPagar(BigDecimal saldoPorPagar) {
-        this.saldoPorPagar = saldoPorPagar;
+    public List<Credito> getCreditos() {
+        return creditos;
     }
 
+    public void setCreditos(List<Credito> creditos) {
+        this.creditos = creditos;
+    }
 }

@@ -81,8 +81,8 @@ public class Usuario implements Serializable {
     private Date fechaModificacion;
     @Column(name = "ESTADO")
     private Short estado;
-    @OneToMany(mappedBy = "idUsuario")
-    private List<Cartera> carteraList;
+//    @OneToMany(mappedBy = "idUsuario")
+//    private List<Cartera> carteraList;
 
     public Usuario() {
     }
@@ -192,15 +192,15 @@ public class Usuario implements Serializable {
     public void setEstado(Short estado) {
         this.estado = estado;
     }
-
-    @XmlTransient
-    public List<Cartera> getCarteraList() {
-        return carteraList;
-    }
-
-    public void setCarteraList(List<Cartera> carteraList) {
-        this.carteraList = carteraList;
-    }
+//
+//    @XmlTransient
+//    public List<Cartera> getCarteraList() {
+//        return carteraList;
+//    }
+//
+//    public void setCarteraList(List<Cartera> carteraList) {
+//        this.carteraList = carteraList;
+//    }
 
     @Override
     public int hashCode() {

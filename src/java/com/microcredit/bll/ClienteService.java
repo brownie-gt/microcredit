@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.microcredit.bean;
+package com.microcredit.bll;
 
 import com.microcredit.bll.JPA;
 import com.microcredit.entity.Cliente;
-import com.microcredit.entity.Credito;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -21,28 +21,28 @@ import org.slf4j.LoggerFactory;
  *
  * @author 30178037
  */
-@ManagedBean(name = "creditoService", eager = true)
+@ManagedBean(name = "clienteService", eager = true)
 @ApplicationScoped
-public class CreditoService {
+public class ClienteService implements Serializable {
 
-    private static final Logger logger = LoggerFactory.getLogger(CreditoService.class);
-    private List<Credito> creditos;
+    private static final Logger logger = LoggerFactory.getLogger(ClienteService.class);
+    private List<Cliente> clientes;
 
-    public CreditoService() {
+    public ClienteService() {
     }
 
     @PostConstruct
     public void init() {
-        logger.debug("CreditoService init()");
-        creditos = new ArrayList<Credito>();
+        logger.debug("ClienteService init()");
+        clientes = new ArrayList<Cliente>();
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
-        creditos = em.createNamedQuery("Credito.findAll", Credito.class).getResultList();
+        clientes = em.createNamedQuery("Cliente.findAll", Cliente.class).getResultList();
         em.close();
     }
 
-    public List<Credito> getCreditos() {
-        return creditos;
+    public List<Cliente> getClientes() {
+        return clientes;
     }
 
 }

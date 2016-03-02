@@ -5,6 +5,7 @@
  */
 package com.microcredit.bean;
 
+import com.microcredit.bll.ClienteService;
 import com.microcredit.bll.JPA;
 import com.microcredit.entity.Cliente;
 import java.io.Serializable;
