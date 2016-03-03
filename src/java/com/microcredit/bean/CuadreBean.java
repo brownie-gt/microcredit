@@ -1,7 +1,6 @@
 package com.microcredit.bean;
 
 import com.microcredit.bll.JPA;
-import com.microcredit.bll.Utils;
 import com.microcredit.dao.DetalleCredito;
 import com.microcredit.entity.Abono;
 import com.microcredit.entity.Cartera;
@@ -90,14 +89,14 @@ public class CuadreBean implements Serializable {
                 creditosCuadre.add(dc);
                 cuadre.setCobroDia(cuadre.getCobroDia().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
                 cuadre.setCobrado(cuadre.getCobrado().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
-            } else {
+            } else if (!calcularCobros) {
                 creditosCuadre.add(dc);
             }
         }
     }
 
     public void cargarGastosDelDia() {
-        gastosDelDia = GastoBean.getGastosByDate(cuadre.getFechaCreacion());
+        gastosDelDia = GastoBean.getGastosByDate(cartera, cuadre.getFechaCreacion());
     }
 
     public void agregarGasto() {

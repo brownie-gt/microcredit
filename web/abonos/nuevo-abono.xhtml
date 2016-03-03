@@ -16,36 +16,38 @@
             <p:messages id="msgs" showDetail="true" autoUpdate="true" closable="true" />
             <p:panel id="panel" header="Nuevo Abono" >
                 <h:panelGrid columns="3">
-                    <p:outputLabel value="Numero de tarjeta:"/>
-                    <p:inputText id="idCredito" value="#{creditoView.idCredito}" />
-                    <p:commandButton value="Buscar" actionListener="#{creditoView.cargarCreditoById}" update="pnlAbono,tbAbonos" process="@this,idCredito"/>
-                    <p:spacer width=""/> <p:spacer width=""/> <p:spacer width=""/>
+                    <h:panelGrid columns="3">
+                        <p:outputLabel value="Numero de tarjeta:"/>
+                        <p:inputText id="idCredito" value="#{creditoView.idCredito}" />
+                        <p:commandButton value="Buscar" actionListener="#{creditoView.cargarCreditoById}" update="pnlAbono,tbAbonos" process="@this,idCredito"/>
+                        <p:spacer width=""/> <p:spacer width=""/> <p:spacer width=""/>
 
-                    <p:outputLabel value="Abono:"/>
-                    <p:inputText id="montoAbonar" value="#{creditoView.montoAbonar}" required="true" requiredMessage="Monto requerido"/>
-                    <p:column/>
-                    <p:outputLabel for="fecha" value="Fecha de abono:"/>
-                    <p:calendar id="fecha" value="#{creditoView.fechaAbono}" pattern="dd/MM/yyyy" required="true" requiredMessage="Fecha requerido"/>
-                    <p:commandButton value="Abonar" actionListener="#{creditoView.ingresarAbono()}" update="pnlAbono,tbAbonos,montoAbonar,fecha" />
-                     <p:spacer width=""/> <p:spacer width=""/> <p:spacer width=""/>
+                        <p:outputLabel value="Monto de abono:"/>
+                        <p:inputText id="montoAbonar" value="#{creditoView.montoAbonar}" required="true" requiredMessage="Monto requerido"/>
+                        <p:column/>
+                        <p:outputLabel for="fecha" value="Fecha de abono:"/>
+                        <p:calendar id="fecha" value="#{creditoView.fechaAbono}" pattern="dd/MM/yyyy" required="true" requiredMessage="Fecha requerido"/>
+                        <p:commandButton value="Abonar" actionListener="#{creditoView.ingresarAbono()}" update="pnlAbono,tbAbonos,montoAbonar,fecha" />
+                        <p:spacer width=""/> <p:spacer width=""/> <p:spacer width=""/>
+                    </h:panelGrid>
+                    <p:spacer width="100px"/>
+                    <p:panelGrid id="pnlAbono" columns="2" columnClasses="label,value">   
+                        <p:outputLabel value="Fecha desembolso:"/><p:outputLabel value="#{creditoView.credito.fechaDesembolso}">
+                            <f:convertDateTime pattern="dd/MM/yyyy" /></p:outputLabel>
+                        <p:outputLabel value="Cuota:"/><p:outputLabel value="#{creditoView.cuota}"/>
+                        <p:outputLabel value="Numero de abonos:"/><p:outputLabel value="#{creditoView.numeroAbonos}"/>
+                        <p:outputLabel value="Abonado:"/><p:outputLabel value="#{creditoView.abonado}"/>
+                        <p:outputLabel value="Saldo por pagar:"/><p:outputLabel value="#{creditoView.saldoPorPagar}"/>
+                        <p:outputLabel value="Total a pagar:"/><p:outputLabel value="#{creditoView.totalAPagar}"/>
+                    </p:panelGrid>
                 </h:panelGrid>
-
-                <p:panelGrid id="pnlAbono" columns="2" columnClasses="label,value">   
-                    <p:outputLabel value="Fecha desembolso:"/><p:outputLabel value="#{creditoView.credito.fechaDesembolso}">
-                        <f:convertDateTime pattern="dd/MM/yyyy" /></p:outputLabel>
-                    <p:outputLabel value="Cuota:"/><p:outputLabel value="#{creditoView.cuota}"/>
-                    <p:outputLabel value="Numero de abonos:"/><p:outputLabel value="#{creditoView.numeroAbonos}"/>
-                    <p:outputLabel value="Abonado:"/><p:outputLabel value="#{creditoView.abonado}"/>
-                    <p:outputLabel value="Saldo por pagar:"/><p:outputLabel value="#{creditoView.saldoPorPagar}"/>
-                    <p:outputLabel value="Total a pagar:"/><p:outputLabel value="#{creditoView.totalAPagar}"/>
-                </p:panelGrid>
                 <p:spacer height="20px"/>
 
                 <p:dataTable id="tbAbonos" var="abo" value="#{creditoView.credito.abonoList}">
                     <f:facet name="header">
                         Abonos
                     </f:facet>
-                    <p:column headerText="Fecha Abono">
+                    <p:column headerText="Fecha de Abono">
                         <h:outputText value="#{abo.fechaAbono}" >
                             <f:convertDateTime pattern="dd/MM/yyyy"/>
                         </h:outputText>

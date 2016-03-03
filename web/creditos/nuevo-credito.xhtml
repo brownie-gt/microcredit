@@ -47,7 +47,7 @@
                     <p:outputLabel for="popup" value="Fecha desembolso:"/><p:calendar id="popup" value="#{creditoView.credito.fechaDesembolso}" pattern="dd/MM/yyyy" required="true"/>
                 </p:panelGrid>
                 <p:spacer height="50px"/>
-                <p:commandButton value="Crear" actionListener="#{creditoView.ingresarCredito()}" resetValues="true" update="panel" />
+                <p:commandButton value="Crear" action="#{creditoView.ingresarCredito()}" resetValues="true" update="panel" />
                 <p:commandButton value="Limpiar" actionListener="#{creditoView.limpiar()}"  resetValues="true" update="panel" />
             </p:panel>
         </h:form>

@@ -22,6 +22,7 @@
       <property name="javax.persistence.jdbc.password" value="mc"/>
       <property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/>
       <property name="javax.persistence.jdbc.user" value="mc"/>
+      <property name="javax.persistence." value="drop-and-create"/>
     </properties>
   </persistence-unit>
 </persistence>

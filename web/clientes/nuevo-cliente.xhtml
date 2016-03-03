@@ -10,25 +10,29 @@
     <h:body>
         <ui:include src="/menu/menuBar.xhtml"/>
         <h:form id="formCliente">
-            <p:panel id="panel" header="Nuevo cliente" >
-                <h:panelGrid columns="2" columnClasses="label,value">
-                    <p:outputLabel value="Primer nombre:"/><p:inputText id="primerNombre" value="#{cliente.cliente.primerNombre}" />
-                    <p:outputLabel value="Segundo nombre:"/><p:inputText value="#{cliente.cliente.segundoNombre}"/>
-                    <p:outputLabel value="Primer apellido:"/><p:inputText value="#{cliente.cliente.primerApellido}" />
-                    <p:outputLabel value="Segundo apellido:"/><p:inputText value="#{cliente.cliente.segundoApellido}"/>
-                    <p:outputLabel value="DPI:"/><p:inputText value="#{cliente.cliente.dpi}" />
-                    <p:outputLabel value="Telefono:"/><p:inputText value="#{cliente.cliente.telefono}" />
-                    <p:outputLabel value="Tipo de negocio:"/><p:inputText value="#{cliente.cliente.tipoNegocio}" />
-                    <p:outputLabel value="Nit:"/><p:inputText value="#{cliente.cliente.nit}"/>
-                    <p:outputLabel value="Dirección:"/><p:inputText value="#{cliente.cliente.direccion}"/>
-                    <p:spacer height=""/><p:spacer height=""/>
-                    <p:outputLabel value="Referencia 1 - Nombre:"/><p:inputText value="#{cliente.ref1.nombre}"/>
-                    <p:outputLabel value="Referencia 1 - Apellido:"/><p:inputText value="#{cliente.ref1.apellido}"/>
-                    <p:outputLabel value="Referencia 1 - Telefono:"/><p:inputText value="#{cliente.ref1.telefono}"/>
-                    <p:spacer height=""/><p:spacer height=""/>
-                    <p:outputLabel value="Referencia 2 - Nombre:"/><p:inputText value="#{cliente.ref2.nombre}"/>
-                    <p:outputLabel value="Referencia 2 - Apellido:"/><p:inputText value="#{cliente.ref2.apellido}"/>
-                    <p:outputLabel value="Referencia 2 - Telefono:"/><p:inputText value="#{cliente.ref2.telefono}"/>
+            <p:panel id="panel" header="Nuevo cliente">
+                <h:panelGrid columns="3" width="80%" >
+                    <h:panelGrid columns="2" columnClasses="label,value">
+                        <p:outputLabel value="Primer nombre:"/><p:inputText id="primerNombre" value="#{cliente.cliente.primerNombre}" />
+                        <p:outputLabel value="Segundo nombre:"/><p:inputText value="#{cliente.cliente.segundoNombre}"/>
+                        <p:outputLabel value="Primer apellido:"/><p:inputText value="#{cliente.cliente.primerApellido}" />
+                        <p:outputLabel value="Segundo apellido:"/><p:inputText value="#{cliente.cliente.segundoApellido}"/>
+                        <p:outputLabel value="DPI:"/><p:inputText value="#{cliente.cliente.dpi}" />
+                        <p:outputLabel value="Telefono:"/><p:inputText value="#{cliente.cliente.telefono}" />
+                        <p:outputLabel value="Tipo de negocio:"/><p:inputText value="#{cliente.cliente.tipoNegocio}" />
+                        <p:outputLabel value="Nit:"/><p:inputText value="#{cliente.cliente.nit}"/>
+                        <p:outputLabel value="Dirección:"/><p:inputText value="#{cliente.cliente.direccion}"/>
+                    </h:panelGrid> 
+                    <p:spacer width=""/>
+                    <h:panelGrid columns="2" columnClasses="label,value" >
+                        <p:outputLabel value="Referencia 1 - Nombre:"/><p:inputText value="#{cliente.ref1.nombre}"/>
+                        <p:outputLabel value="Referencia 1 - Apellido:"/><p:inputText value="#{cliente.ref1.apellido}"/>
+                        <p:outputLabel value="Referencia 1 - Telefono:"/><p:inputText value="#{cliente.ref1.telefono}"/>
+                        <p:spacer height=""/><p:spacer height=""/>
+                        <p:outputLabel value="Referencia 2 - Nombre:"/><p:inputText value="#{cliente.ref2.nombre}"/>
+                        <p:outputLabel value="Referencia 2 - Apellido:"/><p:inputText value="#{cliente.ref2.apellido}"/>
+                        <p:outputLabel value="Referencia 2 - Telefono:"/><p:inputText value="#{cliente.ref2.telefono}"/>
+                    </h:panelGrid>
                 </h:panelGrid>
                 <p:spacer height="50px"/>
                 <p:commandButton value="Crear" action="#{cliente.ingresarCliente()}" resetValues="true" update="formCliente:panel" />

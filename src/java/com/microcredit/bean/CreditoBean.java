@@ -52,7 +52,7 @@ public class CreditoBean extends DetalleCredito implements Serializable {
         setCredito(new Credito());
     }
 
-    public void ingresarCredito() {
+    public String ingresarCredito() {
         logger.debug("ingresarCredito()");
 
         Credito c = new Credito();
@@ -68,10 +68,10 @@ public class CreditoBean extends DetalleCredito implements Serializable {
         em.close();
 //        creditoService.init();
 
-        limpiar();
+        return "/index";
     }
-    
-    public void cargarCreditos(){
+
+    public void cargarCreditos() {
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
         creditos = em.createNamedQuery("Credito.findAll", Credito.class).getResultList();

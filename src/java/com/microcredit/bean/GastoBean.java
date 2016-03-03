@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 /**
  *
@@ -35,14 +36,13 @@ public class GastoBean {
         em.close();
     }
 
-    public static List<Gasto> getGastosByDate(Date fecha) {
+    public static List<Gasto> getGastosByDate(Cartera cartera, Date fecha) {
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
-        /**
-         * Improve CarteraID filter needs to be added and move to GastosBean
-         */
-        List<Gasto> gastos = em.createNamedQuery("Gasto.findByFechaCreacion", Gasto.class)
-                .setParameter("fechaCreacion", Utils.parsearFecha(fecha)).getResultList();
+        Query query = em.createQuery("Select g FROM Gasto g JOIN g.idCartera c WHERE c.idCartera = :idCartera AND g.fechaCreacion = :fechaCreacion");
+        query.setParameter("idCartera", cartera.getIdCartera());
+        query.setParameter("fechaCreacion", Utils.parsearFecha(fecha));
+        List<Gasto> gastos = query.getResultList();
         em.close();
         return gastos;
     }
