@@ -33,7 +33,6 @@ public class ClienteService implements Serializable {
 
     @PostConstruct
     public void init() {
-        logger.debug("ClienteService init()");
         clientes = new ArrayList<Cliente>();
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();

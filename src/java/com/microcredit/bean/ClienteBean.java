@@ -38,7 +38,6 @@ public class ClienteBean implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(ClienteBean.class);
 
     public ClienteBean() {
-        logger.debug("ClienteBean() - constructor");
         ref1 = new ReferenciaCliente();
         ref2 = new ReferenciaCliente();
     }
@@ -66,6 +65,7 @@ public class ClienteBean implements Serializable {
 
     public List<Cliente> getClientes() {
         if (clientes == null) {
+            service.init();
             clientes = service.getClientes();
         }
         return clientes;

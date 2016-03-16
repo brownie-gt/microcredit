@@ -37,7 +37,7 @@ public class TipoGasto implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID_TIPO_GASTO")
-    private BigDecimal idTipoGasto;
+    private Short idTipoGasto;
     @Column(name = "DESCRIPCION")
     private String descripcion;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idTipoGasto")
@@ -46,15 +46,15 @@ public class TipoGasto implements Serializable {
     public TipoGasto() {
     }
 
-    public TipoGasto(BigDecimal idTipoGasto) {
+    public TipoGasto(Short idTipoGasto) {
         this.idTipoGasto = idTipoGasto;
     }
 
-    public BigDecimal getIdTipoGasto() {
+    public Short getIdTipoGasto() {
         return idTipoGasto;
     }
 
-    public void setIdTipoGasto(BigDecimal idTipoGasto) {
+    public void setIdTipoGasto(Short idTipoGasto) {
         this.idTipoGasto = idTipoGasto;
     }
 

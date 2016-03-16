@@ -11,7 +11,7 @@
     <h:body>
         <ui:include src="/menu/menuBar.xhtml"/>
         <p:tooltip />
-        <h:form>
+        <h:form id="formConf">
 
             <p:wizard flowListener="#{cuadreView.onFlowProcess}">
 
@@ -60,39 +60,45 @@
                 <p:tab id="abonos" title="Abonos">
                     <p:panel header="Ingresar Abonos">
                         <p:messages showDetail="true" autoUpdate="true" closable="true"/>
+                        <p:outputLabel value="Total: #{cuadreView.countCreditos}"/><p:spacer width="15px"/>
+                        <p:outputLabel value="Seleccionados:"/><p:outputLabel id="cSelec" value="#{cuadreView.countCreditosSeleccionados}"/>
 
-                        <p:dataTable id="dtCreditos" var="credit" value="#{cuadreView.creditosCuadre}" editable="true" style="margin-bottom:20px">
-                            <p:ajax event="rowEdit" listener="#{cuadreView.onRowEdit}" />
-                            <p:ajax event="rowEditCancel" listener="#{cuadreView.onRowCancel}" />
+                        <p:dataTable id="dtCreditos" var="credit" value="#{cuadreView.creditosCuadre}" editable="true" style="margin-bottom:20px"
+                                     stickyHeader="true" selection="#{cuadreView.creditosSeleccionados}" rowKey="#{credit.credito.idCredito}"
+                                     filteredValue="#{cuadreView.filteredCreditosCuadre}" editMode="cell" >
 
-                            <p:column headerText="Ruta">
+
+                            <p:column selectionMode="multiple" style="width:12px;text-align:center"/>
+                            <p:column headerText="Ruta" width="15%">
                                 <h:outputText value="#{credit.credito.idRuta.nombre}" />
                             </p:column>
-                            <p:column headerText="Id Credito">
+                            <p:column headerText="Cliente" width="20%">
+                                <h:outputText value="#{credit.credito.idCliente.primerNombre}" rendered="#{not empty credit.credito.idCliente.primerNombre}"/>
+                                <h:outputText value=" #{credit.credito.idCliente.segundoNombre}" rendered="#{not empty credit.credito.idCliente.segundoNombre}"/>
+                                <h:outputText value=" #{credit.credito.idCliente.primerApellido}" rendered="#{not empty credit.credito.idCliente.primerApellido}"/>
+                                <h:outputText value=" #{credit.credito.idCliente.segundoApellido}" rendered="#{not empty credit.credito.idCliente.segundoApellido}"/>
+                            </p:column>
+
+                            <p:column filterBy="#{credit.credito.idCredito}" headerText="No. tarjeta" filterMatchMode="startsWith" width="15%">
                                 <h:outputText value="#{credit.credito.idCredito}" />
                             </p:column>
-                            <p:column headerText="Cliente">
-                                <h:outputText value="#{credit.credito.idCliente.primerNombre}" rendered="#{not empty credit.credito.idCliente.primerNombre}"/>
-                                <h:outputText value="#{credit.credito.idCliente.primerNombre}" rendered="#{not empty credit.credito.idCliente.segundoNombre}"/>
-                                <h:outputText value=" #{credit.credito.idCliente.primerApellido}" rendered="#{not empty credit.credito.idCliente.primerApellido}"/>
-                                <h:outputText value="#{credit.credito.idCliente.primerNombre}" rendered="#{not empty credit.credito.idCliente.segundoApellido}"/>
-                            </p:column>
-                            <p:column headerText="Cuota">
+
+                            <p:column headerText="Cuota" width="10%">
                                 <p:cellEditor>
                                     <f:facet name="output"><h:outputText value="#{credit.cuota}" /></f:facet>
                                     <f:facet name="input"><p:inputText id="modelInput" value="#{credit.cuota}" style="width:100%"/></f:facet>
                                 </p:cellEditor>
                             </p:column>
-                            <p:column style="width:32px">
-                                <p:rowEditor />
+
+                            <p:column headerText="Monto Prestado" width="10%" >
+                                <h:outputText value="#{credit.credito.monto}" style="color: blue;"/>
                             </p:column>
-                            <p:column headerText="Monto Prestado">
-                                <h:outputText value="#{credit.credito.monto}" />
-                            </p:column>
-                            <p:column headerText="Abonado">
+
+
+                            <p:column headerText="Abonado" width="10%"  style="color: green;">
                                 <h:outputText value="#{credit.abonado}" />
                             </p:column>
-                            <p:column headerText="Saldo Por Pagar">
+                            <p:column headerText="Saldo Por Pagar" width="10%" style="color: red;">
                                 <h:outputText value="#{credit.saldoPorPagar}" />
                             </p:column>
                         </p:dataTable>
@@ -101,7 +107,7 @@
 
                 <p:tab id="confirmacion" title="Confirmacion" >
                     <p:panel header="Confirmar cuadre">
-                        <h:panelGrid id="confirmation" columns="2" >
+                        <h:panelGrid id="confirmation" columns="3" >
 
                             <h:panelGrid id="pnlCuadre1" columns="2" columnClasses="label,value">
                                 <p:outputLabel value="Cobro del día:"/><p:inputText value="#{cuadreView.cuadre.cobroDia}" disabled="true"/>
@@ -121,6 +127,19 @@
                                 <p:outputLabel value="Faltante:"/><p:inputText id="faltante" value="#{cuadreView.faltante}" disabled="true"/>
                                 <p:outputLabel value="Sobrante:"/><p:inputText id="sobrante" value="#{cuadreView.sobrante}" disabled="true"/>
                             </h:panelGrid>
+
+                            <h:panelGrid id="pnlCuadre3" columns="1">
+                                <p:dataTable value="#{cuadreView.cobrosPorRuta}" var="cpr">
+                                    <f:facet name="header">Cobrado por rutas</f:facet>
+                                    <p:column headerText="Ruta">
+                                        #{cpr.ruta.nombre}
+                                    </p:column>
+                                    <p:column headerText="Cobrado">
+                                        #{cpr.cobro}
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGrid>
+
                         </h:panelGrid>
 
                         <p:commandButton value="Confirmar" action="#{cuadreView.ingresarCuadre()}" />

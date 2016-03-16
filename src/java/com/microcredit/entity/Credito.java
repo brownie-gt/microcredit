@@ -61,7 +61,7 @@ public class Credito implements Serializable {
     private BigDecimal idCredito;
     @Basic(optional = false)
     @Column(name = "FECHA_DESEMBOLSO")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date fechaDesembolso;
 //    @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
 //    @ManyToOne(optional = false)

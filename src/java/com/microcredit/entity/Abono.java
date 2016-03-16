@@ -7,7 +7,6 @@ package com.microcredit.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -36,7 +35,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Abono.findByIdAbono", query = "SELECT a FROM Abono a WHERE a.idAbono = :idAbono"),
     @NamedQuery(name = "Abono.findByMonto", query = "SELECT a FROM Abono a WHERE a.monto = :monto"),
     @NamedQuery(name = "Abono.findByFechaAbono", query = "SELECT a FROM Abono a WHERE a.fechaAbono = :fechaAbono")})
-@SequenceGenerator(name = "ABONO_SEQ", sequenceName = "ABONO_SEQ", allocationSize = 1)
+
 public class Abono implements Serializable {
     @Basic(optional = false)
     @Column(name = "MONTO")
@@ -46,12 +45,13 @@ public class Abono implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id
     @Basic(optional = false)
+    @SequenceGenerator(name = "ABONO_SEQ", sequenceName = "ABONO_SEQ", allocationSize = 1, initialValue = 1)
     @GeneratedValue(generator = "ABONO_SEQ")
     @Column(name = "ID_ABONO")
     private BigDecimal idAbono;
     @Basic(optional = false)
     @Column(name = "FECHA_ABONO")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date fechaAbono;
     @JoinColumn(name = "ID_CREDITO", referencedColumnName = "ID_CREDITO")
     @ManyToOne(optional = false)

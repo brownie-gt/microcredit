@@ -37,7 +37,7 @@ public class PerfilUsuario implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID_PERFIL")
-    private BigDecimal idPerfil;
+    private Short idPerfil;
     @Column(name = "NOMBRE")
     private String nombre;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idPerfil")
@@ -46,15 +46,15 @@ public class PerfilUsuario implements Serializable {
     public PerfilUsuario() {
     }
 
-    public PerfilUsuario(BigDecimal idPerfil) {
+    public PerfilUsuario(Short idPerfil) {
         this.idPerfil = idPerfil;
     }
 
-    public BigDecimal getIdPerfil() {
+    public Short getIdPerfil() {
         return idPerfil;
     }
 
-    public void setIdPerfil(BigDecimal idPerfil) {
+    public void setIdPerfil(Short idPerfil) {
         this.idPerfil = idPerfil;
     }
 

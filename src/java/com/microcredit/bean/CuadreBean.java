@@ -1,5 +1,6 @@
 package com.microcredit.bean;
 
+import com.microcredit.bll.CobroPorRuta;
 import com.microcredit.bll.JPA;
 import com.microcredit.dao.DetalleCredito;
 import com.microcredit.entity.Abono;
@@ -21,6 +22,8 @@ import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.event.RowEditEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.event.UnselectEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +34,7 @@ public class CuadreBean implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(CuadreBean.class);
     private List<Abono> abonos;
     private List<DetalleCredito> creditosCuadre;
+    private List<DetalleCredito> filteredCreditosCuadre;
 
     private Cuadre cuadre;
     private Short idCartera;
@@ -39,6 +43,7 @@ public class CuadreBean implements Serializable {
     private BigDecimal faltante;
     private BigDecimal sobrante;
     private BigDecimal totalPrestado;
+    private List<CobroPorRuta> cobrosPorRuta;
 
     private BigDecimal totalGastos;
     private List<Gasto> gastos;
@@ -48,6 +53,10 @@ public class CuadreBean implements Serializable {
     private List<Gasto> gastosDelDia;
     private BigDecimal montoGasto;
 
+    private List<Credito> creditosSeleccionados;
+    private int countCreditosSeleccionados;
+    private int countCreditos;
+
     public CuadreBean() {
         cuadre = new Cuadre();
         gastos = new ArrayList<>();
@@ -56,6 +65,7 @@ public class CuadreBean implements Serializable {
     @PostConstruct
     public void init() {
         listTipoGasto = GastoBean.getTiposDeGasto();
+//        cargarCarteraById();
     }
 
     public void cargarCarteraById() {
@@ -89,6 +99,7 @@ public class CuadreBean implements Serializable {
                 creditosCuadre.add(dc);
                 cuadre.setCobroDia(cuadre.getCobroDia().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
                 cuadre.setCobrado(cuadre.getCobrado().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
+                countCreditos++;
             } else if (!calcularCobros) {
                 creditosCuadre.add(dc);
             }
@@ -113,28 +124,31 @@ public class CuadreBean implements Serializable {
         tipoGastoSeleccionado = null;
     }
 
-    private void ingresarGastos() {
-        for (Gasto g : gastosDelDia) {
-            GastoBean.ingresarGasto(cartera, cuadre.getFechaCreacion(), g.getMonto(), g.getIdTipoGasto());
+    private void ingresarGastos(EntityManager em) {
+        if (gastosDelDia != null) {
+            for (Gasto g : gastosDelDia) {
+                GastoBean.ingresarGasto(em, cartera, cuadre.getFechaCreacion(), g.getMonto(), g.getIdTipoGasto());
+            }
         }
     }
 
-    private void ingresarAbonos() {
+    private void ingresarAbonos(EntityManager em) {
         for (DetalleCredito dc : creditosCuadre) {
             if (dc.getCuota().intValue() > 0) {
-                AbonoBean.ingresarAbono(dc.getCredito(), dc.getCuota(), cuadre.getFechaCreacion());
+                AbonoBean.ingresarAbono(em, dc.getCredito(), dc.getCuota(), cuadre.getFechaCreacion());
             }
         }
     }
 
     public String ingresarCuadre() {
-        ingresarAbonos();
-        ingresarGastos();
-        cuadre.setIdCartera(cartera);
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
+        ingresarAbonos(em);
+        ingresarGastos(em);
+        cuadre.setIdCartera(cartera);
         em.persist(cuadre);
         em.getTransaction().commit();
+        em.close();
         return "/index";
     }
 
@@ -170,16 +184,45 @@ public class CuadreBean implements Serializable {
     }
 
     private void calcularCobrado() {
+        inicializarCobroPorRutas();
         cuadre.setCobrado(new BigDecimal(0));
         for (DetalleCredito dc : creditosCuadre) {
             cuadre.setCobrado(cuadre.getCobrado().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
+            calcularCobradoPorRuta(dc);
+        }
+    }
+
+    private void calcularCobradoPorRuta(DetalleCredito dc) {
+        if (dc.getCredito().getIdRuta() == null) {
+            return;
+        }
+        int i;
+        for (i = 0; i < cobrosPorRuta.size(); i++) {
+            if (cobrosPorRuta.get(i).getRuta().getIdRuta().compareTo(dc.getCredito().getIdRuta().getIdRuta()) == 0) {
+                cobrosPorRuta.get(i).setCobro(cobrosPorRuta.get(i).getCobro().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
+                break;
+            }
+        }
+    }
+
+    private void inicializarCobroPorRutas() {
+        int i;
+        cobrosPorRuta = new ArrayList<>();
+        CobroPorRuta o;
+        for (i = 0; i < cartera.getRutaList().size(); i++) {
+            o = new CobroPorRuta();
+            o.setRuta(cartera.getRutaList().get(i));
+            o.setCobro(new BigDecimal(0));
+            cobrosPorRuta.add(o);
         }
     }
 
     private void calcularTotalGastos() {
         totalGastos = new BigDecimal(0);
-        for (Gasto g : gastosDelDia) {
-            totalGastos = totalGastos.add(g.getMonto()).setScale(0, RoundingMode.HALF_EVEN);
+        if (gastosDelDia != null) {
+            for (Gasto g : gastosDelDia) {
+                totalGastos = totalGastos.add(g.getMonto()).setScale(0, RoundingMode.HALF_EVEN);
+            }
         }
     }
 
@@ -195,18 +238,25 @@ public class CuadreBean implements Serializable {
         return event.getNewStep();
     }
 
-    public void onRowEdit(RowEditEvent event) {
-        DetalleCredito creditoEditado = (DetalleCredito) event.getObject();
-        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Cuota editada", "Tarjeta: " + creditoEditado.getCredito().getIdCredito()
-                + " Cuota: " + creditoEditado.getCuota().toString());
-        FacesContext.getCurrentInstance().addMessage(null, msg);
+    public void onRowSelect(SelectEvent event) {
+        countCreditosSeleccionados++;
+    }
 
+    public void onRowUnselect(UnselectEvent event) {
+        countCreditosSeleccionados--;
+    }
+
+    public void onRowEdit(RowEditEvent event) {
+//        DetalleCredito creditoEditado = (DetalleCredito) event.getObject();
+//        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+//                "Cuota editada", "Tarjeta: " + creditoEditado.getCredito().getIdCredito()
+//                + " Cuota: " + creditoEditado.getCuota().toString());
+//        FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
     public void onRowCancel(RowEditEvent event) {
-        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Edición cancelada", ((DetalleCredito) event.getObject()).getCuota().toString());
-        FacesContext.getCurrentInstance().addMessage(null, msg);
+//        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Edición cancelada", ((DetalleCredito) event.getObject()).getCuota().toString());
+//        FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
     public List<Abono> getAbonos() {
@@ -305,6 +355,42 @@ public class CuadreBean implements Serializable {
 
     public BigDecimal getTotalPrestado() {
         return totalPrestado;
+    }
+
+    public int getCountCreditos() {
+        return countCreditos;
+    }
+
+    public void setCountCreditos(int countCreditos) {
+        this.countCreditos = countCreditos;
+    }
+
+    public List<Credito> getCreditosSeleccionados() {
+        return creditosSeleccionados;
+    }
+
+    public void setCreditosSeleccionados(List<Credito> creditosSeleccionados) {
+        this.creditosSeleccionados = creditosSeleccionados;
+    }
+
+    public int getCountCreditosSeleccionados() {
+        return countCreditosSeleccionados;
+    }
+
+    public void setCountCreditosSeleccionados(int countCreditosSeleccionados) {
+        this.countCreditosSeleccionados = countCreditosSeleccionados;
+    }
+
+    public List<DetalleCredito> getFilteredCreditosCuadre() {
+        return filteredCreditosCuadre;
+    }
+
+    public void setFilteredCreditosCuadre(List<DetalleCredito> filteredCreditosCuadre) {
+        this.filteredCreditosCuadre = filteredCreditosCuadre;
+    }
+
+    public List<CobroPorRuta> getCobrosPorRuta() {
+        return cobrosPorRuta;
     }
 
 }

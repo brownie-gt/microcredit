@@ -7,6 +7,7 @@ package com.microcredit.dao;
 
 import com.microcredit.entity.Abono;
 import com.microcredit.entity.Credito;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import org.slf4j.Logger;
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author 30178037
  */
-public class DetalleCredito {
+public class DetalleCredito implements Serializable{
 
     private static final Logger logger = LoggerFactory.getLogger(DetalleCredito.class);
     private BigDecimal interes;

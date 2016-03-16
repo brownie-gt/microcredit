@@ -5,10 +5,7 @@
  */
 package com.microcredit.bll;
 
-import com.microcredit.bll.JPA;
-import com.microcredit.entity.Cliente;
 import com.microcredit.entity.TipoGasto;
-import java.math.BigDecimal;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -26,7 +23,7 @@ public class TipoGastoConverter implements Converter{
             try {
                 EntityManager em = JPA.getEntityManager();
                 em.getTransaction().begin();
-                TipoGasto tg = em.find(TipoGasto.class, new BigDecimal(value));
+                TipoGasto tg = em.find(TipoGasto.class, Short.valueOf(value));
                 em.close();
                 return tg;
             } catch (NumberFormatException e) {

@@ -41,7 +41,7 @@ public class BaseDia implements Serializable {
     private BigInteger monto;
     @Basic(optional = false)
     @Column(name = "FECHA_CREACION")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date fechaCreacion;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id

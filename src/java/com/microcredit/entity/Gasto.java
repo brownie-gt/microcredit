@@ -41,9 +41,9 @@ public class Gasto implements Serializable {
     @Id
     @Basic(optional = false)
     @GeneratedValue(generator = "GASTO_SEQ")
-    @SequenceGenerator(name = "GASTO_SEQ", sequenceName = "GASTO_SEQ", allocationSize = 1)
+    @SequenceGenerator(name = "GASTO_SEQ", sequenceName = "GASTO_SEQ", allocationSize = 1, initialValue = 1)
     @Column(name = "ID_GASTO")
-    private String idGasto;
+    private Short idGasto;
     @Basic(optional = false)
     @Column(name = "FECHA_CREACION")
     @Temporal(TemporalType.DATE)
@@ -61,21 +61,21 @@ public class Gasto implements Serializable {
     public Gasto() {
     }
 
-    public Gasto(String idGasto) {
+    public Gasto(Short idGasto) {
         this.idGasto = idGasto;
     }
 
-    public Gasto(String idGasto, Date fechaCreacion, BigDecimal monto) {
+    public Gasto(Short idGasto, Date fechaCreacion, BigDecimal monto) {
         this.idGasto = idGasto;
         this.fechaCreacion = fechaCreacion;
         this.monto = monto;
     }
 
-    public String getIdGasto() {
+    public int getIdGasto() {
         return idGasto;
     }
 
-    public void setIdGasto(String idGasto) {
+    public void setIdGasto(Short idGasto) {
         this.idGasto = idGasto;
     }
 

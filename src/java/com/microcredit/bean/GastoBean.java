@@ -22,18 +22,18 @@ import javax.persistence.Query;
  */
 public class GastoBean {
 
-    public static void ingresarGasto(Cartera cartera, Date fecha, BigDecimal montoGasto, TipoGasto tipoGasto) {
+    public static void ingresarGasto(EntityManager em, Cartera cartera, Date fecha, BigDecimal montoGasto, TipoGasto tipoGasto) {
         Gasto gasto = new Gasto();
         gasto.setIdCartera(cartera);
         gasto.setFechaCreacion(Utils.parsearFecha(fecha));
         gasto.setMonto(montoGasto);
         gasto.setIdTipoGasto(tipoGasto);
 
-        EntityManager em = JPA.getEntityManager();
-        em.getTransaction().begin();
+//        EntityManager em = JPA.getEntityManager();
+//        em.getTransaction().begin();
         em.persist(gasto);
-        em.getTransaction().commit();
-        em.close();
+//        em.getTransaction().commit();
+//        em.close();
     }
 
     public static List<Gasto> getGastosByDate(Cartera cartera, Date fecha) {

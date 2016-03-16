@@ -11,12 +11,17 @@
         <ui:include src="/menu/menuBar.xhtml"/>
         <h:form id="formCliente">
             <p:panel id="panel" header="Nuevo cliente">
+                <p:messages/>
                 <h:panelGrid columns="3" width="80%" >
                     <h:panelGrid columns="2" columnClasses="label,value">
-                        <p:outputLabel value="Primer nombre:"/><p:inputText id="primerNombre" value="#{cliente.cliente.primerNombre}" />
+                        <p:outputLabel for="primerNombre" value="Primer nombre:"/>
+                        <p:inputText id="primerNombre" value="#{cliente.cliente.primerNombre}" required="true"/>
                         <p:outputLabel value="Segundo nombre:"/><p:inputText value="#{cliente.cliente.segundoNombre}"/>
-                        <p:outputLabel value="Primer apellido:"/><p:inputText value="#{cliente.cliente.primerApellido}" />
+                        
+                        <p:outputLabel for="pApellido" value="Primer apellido:"/>
+                        <p:inputText id="pApellido" value="#{cliente.cliente.primerApellido}" required="true"/>
                         <p:outputLabel value="Segundo apellido:"/><p:inputText value="#{cliente.cliente.segundoApellido}"/>
+                        
                         <p:outputLabel value="DPI:"/><p:inputText value="#{cliente.cliente.dpi}" />
                         <p:outputLabel value="Telefono:"/><p:inputText value="#{cliente.cliente.telefono}" />
                         <p:outputLabel value="Tipo de negocio:"/><p:inputText value="#{cliente.cliente.tipoNegocio}" />

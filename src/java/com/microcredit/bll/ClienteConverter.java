@@ -22,7 +22,6 @@ public class ClienteConverter implements Converter {
     private static final Logger logger = LoggerFactory.getLogger(ClienteConverter.class);
 
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
-        logger.debug("getAsObject() - value: " + value);
 
         if (value != null && value.trim().length() > 0) {
             try {

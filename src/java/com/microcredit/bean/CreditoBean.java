@@ -20,6 +20,8 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import org.primefaces.event.RowEditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +45,6 @@ public class CreditoBean extends DetalleCredito implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(CreditoBean.class);
 
     public CreditoBean() {
-        logger.debug("CreditoBean()");
     }
 
     @PostConstruct
@@ -53,8 +54,6 @@ public class CreditoBean extends DetalleCredito implements Serializable {
     }
 
     public String ingresarCredito() {
-        logger.debug("ingresarCredito()");
-
         Credito c = new Credito();
         c.setIdCredito(getCredito().getIdCredito());
         c.setIdCliente(cliente);
@@ -103,30 +102,52 @@ public class CreditoBean extends DetalleCredito implements Serializable {
         }
     }
 
+    public void onRowEdit(RowEditEvent event) {
+        DetalleCredito dc = (DetalleCredito) event.getObject();
+        updateCredito(dc.getCredito());
+        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Credito editado", "Tarjeta: " + dc.getCredito().getIdCredito());
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+
+    }
+
+    public void onRowCancel(RowEditEvent event) {
+        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Edición cancelada", "");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
+
+    private void updateCredito(Credito c) {
+        EntityManager em = JPA.getEntityManager();
+        Credito temp = em.find(Credito.class, c.getIdCredito());
+
+        em.getTransaction().begin();
+        temp.setFechaDesembolso(c.getFechaDesembolso());
+        em.getTransaction().commit();
+    }
+
     public static List<Credito> getCreditosByDate(Cartera cartera, Date fecha) {
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
-        /**
-         * Improve CarteraID filter needs to be added
-         */
-        List<Credito> result = em.createNamedQuery("Credito.findByFechaDesembolso", Credito.class).
-                setParameter("fechaDesembolso", Utils.parsearFecha(fecha)).getResultList();
+        Query query = em.createQuery("SELECT c FROM Credito c JOIN c.idRuta.idCartera cart "
+                + "WHERE cart.idCartera = :idCartera AND c.fechaDesembolso = :fechaDesembolso");
+        query.setParameter("idCartera", cartera.getIdCartera());
+        query.setParameter("fechaDesembolso", Utils.parsearFecha(fecha));
+        List<Credito> creditos = query.getResultList();
         em.close();
-        List<Credito> creditos = new ArrayList<>();
-        for (Credito c : result) {
-            if (c.getIdRuta().getIdCartera().getIdCartera().compareTo(cartera.getIdCartera()) == 0) {
-                creditos.add(c);
-            }
-        }
         return creditos;
     }
 
     public void ingresarAbono() {
         cargarCreditoById();
-        AbonoBean.ingresarAbono(getCredito(), montoAbonar, fechaAbono);
+        EntityManager em = JPA.getEntityManager();
+        em.getTransaction().begin();
+        AbonoBean.ingresarAbono(em, getCredito(), montoAbonar, fechaAbono);
+        em.getTransaction().commit();
+        em.close();
         cargarCreditoById();
         montoAbonar = null;
         fechaAbono = null;
+        idCredito = null;
     }
 
     public List<Cliente> completarCliente(String query) {

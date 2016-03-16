@@ -5,7 +5,6 @@
  */
 package com.microcredit.bean;
 
-import com.microcredit.bll.JPA;
 import com.microcredit.entity.Abono;
 import com.microcredit.entity.Credito;
 import java.io.Serializable;
@@ -16,11 +15,11 @@ import javax.persistence.EntityManager;
 
 public class AbonoBean implements Serializable {
 
-    public List<Abono> getAbonos(){
+    public List<Abono> getAbonos() {
         return null;
     }
-    
-    public static void ingresarAbono(Credito c, BigDecimal montoAbonar, Date fechaAbono) {
+
+    public static void ingresarAbono(EntityManager em, Credito c, BigDecimal montoAbonar, Date fechaAbono) {
         Abono a = new Abono();
         a.setIdCredito(c);
         a.setMonto(montoAbonar);
@@ -28,11 +27,11 @@ public class AbonoBean implements Serializable {
         c.getAbonoList().size();//just to instatiate
         c.getAbonoList().add(a);
 
-        EntityManager em = JPA.getEntityManager();
-        em.getTransaction().begin();
+//        EntityManager em = JPA.getEntityManager();
+//        em.getTransaction().begin();
         em.merge(c);
-        em.getTransaction().commit();
-        em.close();
+//        em.getTransaction().commit();
+//        em.close();
     }
 
 }

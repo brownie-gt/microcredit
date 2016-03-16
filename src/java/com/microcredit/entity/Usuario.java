@@ -8,7 +8,6 @@ package com.microcredit.entity;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,12 +17,10 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -74,10 +71,10 @@ public class Usuario implements Serializable {
     private String dpi;
     @Basic(optional = false)
     @Column(name = "FECHA_CREACION")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date fechaCreacion;
     @Column(name = "FECHA_MODIFICACION")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date fechaModificacion;
     @Column(name = "ESTADO")
     private Short estado;

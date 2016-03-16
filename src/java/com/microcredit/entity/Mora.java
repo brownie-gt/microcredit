@@ -45,7 +45,7 @@ public class Mora implements Serializable {
     private short monto;
     @Basic(optional = false)
     @Column(name = "FECHA_CREACION")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date fechaCreacion;
     @JoinColumn(name = "ID_CREDITO", referencedColumnName = "ID_CREDITO")
     @ManyToOne(optional = false)

@@ -74,10 +74,10 @@ public class Cliente implements Serializable {
     private String tipoNegocio;
     @Basic(optional = false)
     @Column(name = "FECHA_CREACION")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date fechaCreacion;
     @Column(name = "FECHA_MODIFICACION")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date fechaModificacion;
     @Column(name = "ESTADO")
     private Short estado;

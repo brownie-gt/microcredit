@@ -39,7 +39,7 @@ public class ReferenciaCliente implements Serializable {
     @GeneratedValue(generator = "REFERENCIA_CLIENTE_SEQ")
     @SequenceGenerator(name = "REFERENCIA_CLIENTE_SEQ", sequenceName = "REFERENCIA_CLIENTE_SEQ", allocationSize = 1)
     @Column(name = "ID_REFERENCIA")
-    private String idReferencia;
+    private Short idReferencia;
     @Column(name = "NOMBRE")
     private String nombre;
     @Column(name = "APELLIDO")
@@ -53,15 +53,15 @@ public class ReferenciaCliente implements Serializable {
     public ReferenciaCliente() {
     }
 
-    public ReferenciaCliente(String idReferencia) {
+    public ReferenciaCliente(Short idReferencia) {
         this.idReferencia = idReferencia;
     }
 
-    public String getIdReferencia() {
+    public Short getIdReferencia() {
         return idReferencia;
     }
 
-    public void setIdReferencia(String idReferencia) {
+    public void setIdReferencia(Short idReferencia) {
         this.idReferencia = idReferencia;
     }
 
