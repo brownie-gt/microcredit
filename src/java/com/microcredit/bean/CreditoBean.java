@@ -11,6 +11,7 @@ import com.microcredit.entity.Ruta;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -178,6 +179,15 @@ public class CreditoBean extends DetalleCredito implements Serializable {
         em.getTransaction().begin();
         rutas = em.createNamedQuery("Ruta.findAll", Ruta.class).getResultList();
         em.close();
+    }
+
+    public static boolean isNuevoCredito(Date fechaDesembolso, Date fechaCuadre) {
+        Calendar c1 = Calendar.getInstance();
+        Calendar c2 = Calendar.getInstance();
+        c1.setTime(fechaDesembolso);
+        c2.setTime(fechaCuadre);
+        return c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR)
+                && c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR);
     }
 
     public BigDecimal getIdCredito() {

@@ -5,6 +5,7 @@
  */
 package com.microcredit.dao;
 
+import com.microcredit.bean.CreditoBean;
 import com.microcredit.entity.Abono;
 import com.microcredit.entity.Credito;
 import java.io.Serializable;
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author 30178037
  */
-public class DetalleCredito implements Serializable{
+public class DetalleCredito implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(DetalleCredito.class);
     private BigDecimal interes;
@@ -79,7 +80,11 @@ public class DetalleCredito implements Serializable{
             cuota = new BigDecimal(0);
             pagado = true;
         } else {
-            cuota = totalAPagar.divide(new BigDecimal(numeroCuotas)).setScale(0, RoundingMode.HALF_EVEN);
+//            if (CreditoBean.isDesembolsoDeHoy(credito.getFechaDesembolso())) {
+//                cuota = new BigDecimal(0);
+//            } else {
+                cuota = totalAPagar.divide(new BigDecimal(numeroCuotas)).setScale(0, RoundingMode.HALF_EVEN);
+//            }
             pagado = false;
         }
     }

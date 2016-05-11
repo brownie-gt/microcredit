@@ -34,7 +34,10 @@
                             <h:outputText value="#{cli.idCliente} "/>
                         </p:column>
                         <p:column>
-                            <h:outputText value="#{cli.primerNombre} " /><h:outputText value="#{cli.primerApellido}" />
+                            <h:outputText value="#{cli.primerNombre} " rendered="#{not empty cli.primerNombre}"/>
+                            <h:outputText value="#{cli.segundoNombre} " rendered="#{not empty cli.segundoNombre}"/>
+                            <h:outputText value="#{cli.primerApellido} " rendered="#{not empty cli.primerApellido}"/>
+                            <h:outputText value="#{cli.segundoApellido}" rendered="#{not empty cli.segundoApellido}"/>
                         </p:column>
                     </p:autoComplete>
 

@@ -7,13 +7,24 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>MicroCredit</title>
+        <script>
+            window.onbeforeunload = function (e) {
+                e = e || window.event;
+
+                if (e) {
+                    e.returnValue = 'Esta seguro que desea salir?';
+                }
+
+                return 'Esta seguro que desea salir?';
+            };
+        </script>
     </h:head>
     <h:body>
         <ui:include src="/menu/menuBar.xhtml"/>
         <p:tooltip />
         <h:form id="formConf">
 
-            <p:wizard flowListener="#{cuadreView.onFlowProcess}">
+            <p:wizard flowListener="#{cuadreView.onFlowProcess}" backLabel="Atrás" nextLabel="Siguiente">
 
                 <p:tab id="cartera" title="Cartera">
                     <p:panel header="Seleccionar cartera">
@@ -25,8 +36,8 @@
                             </p:inputText>
                             <p:outputLabel for="fecha" value="Fecha de cuadre:"/>
                             <p:calendar id="fecha" value="#{cuadreView.cuadre.fechaCreacion}" pattern="dd/MM/yyyy" required="true" requiredMessage="Fecha requerido"/>
-                            <p:outputLabel value="Base:"/><p:inputText value="#{cuadreView.cuadre.baseDia}"  required="true" requiredMessage="Base requerido"/>
-                            <p:outputLabel value="Cobro cobrador:"/><p:inputText value="#{cuadreView.cuadre.cobroCobrador}" required="true" requiredMessage="Cobro cobrador requerido"/>
+                            <p:outputLabel value="Base:" rendered="false"/><p:inputText rendered="false" value="#{cuadreView.cuadre.baseDia}"  required="true" requiredMessage="Base requerido"/>
+                            <p:outputLabel value="Cobro cobrador:" rendered="false"/><p:inputText rendered="false" value="#{cuadreView.cuadre.cobroCobrador}" required="true" requiredMessage="Cobro cobrador requerido"/>
                         </h:panelGrid>
                     </p:panel>
 
@@ -39,8 +50,9 @@
                             </h:selectOneMenu>
                             <p:column/><p:column/>
                             <p:outputLabel value="Monto:"/><p:inputText value="#{cuadreView.montoGasto}"/>
+                            <p:column/><p:column/>
+                            <p:outputLabel value="Descripción:"/><p:inputText value="#{cuadreView.descripcionGasto}"/>
                             <p:commandButton value="Ingresar" actionListener="#{cuadreView.agregarGasto()}" update="pnlGastos"/>
-                            <p:commandButton value="Cargar" actionListener="#{cuadreView.cargarGastosDelDia()}" update="dtGastos"/>
                         </h:panelGrid>
                         <p:spacer height=""/>
                         <p:dataTable id="dtGastos" var="gast" value="#{cuadreView.gastosDelDia}" >
@@ -50,71 +62,106 @@
                             <p:column headerText="Monto">
                                 <h:outputText value="#{gast.monto}" />
                             </p:column>
-                            <p:column headerText="Descripcion">
+                            <p:column headerText="Tipo">
                                 <h:outputText value="#{gast.idTipoGasto.descripcion}" />
+                            </p:column>
+                            <p:column headerText="Descripción">
+                                <h:outputText value="#{gast.descripcion}" />
                             </p:column>
                         </p:dataTable>
                     </p:panel>
                 </p:tab>
 
+                <!-- ***************************************************************************************************************-->
+                <!-- ********************************************* Abonos **********************************************************-->
+                <!-- ***************************************************************************************************************-->
                 <p:tab id="abonos" title="Abonos">
                     <p:panel header="Ingresar Abonos">
                         <p:messages showDetail="true" autoUpdate="true" closable="true"/>
-                        <p:outputLabel value="Total: #{cuadreView.countCreditos}"/><p:spacer width="15px"/>
-                        <p:outputLabel value="Seleccionados:"/><p:outputLabel id="cSelec" value="#{cuadreView.countCreditosSeleccionados}"/>
+                        <p:outputLabel value="Seleccionados:" rendered="false"/><p:outputLabel id="cSelec" value="#{cuadreView.countCreditosSeleccionados}" rendered="false"/>
 
                         <p:dataTable id="dtCreditos" var="credit" value="#{cuadreView.creditosCuadre}" editable="true" style="margin-bottom:20px"
-                                     stickyHeader="true" selection="#{cuadreView.creditosSeleccionados}" rowKey="#{credit.credito.idCredito}"
+                                     selection="#{cuadreView.creditosSeleccionados}" rowKey="#{credit.credito.idCredito}"
                                      filteredValue="#{cuadreView.filteredCreditosCuadre}" editMode="cell" >
+                            <f:facet name="header">
+                                <h:outputText value="#{cuadreView.cuadre.fechaCreacion}" style="font-weight: bold; color: green;">
+                                    <f:convertDateTime pattern="EEE, dd/MMM/yyyy" locale="es_GT"/></h:outputText>
+                            </f:facet>
 
+                            <p:column selectionMode="multiple" width="5%" style="text-align:center" />
 
-                            <p:column selectionMode="multiple" style="width:12px;text-align:center"/>
-                            <p:column headerText="Ruta" width="15%">
-                                <h:outputText value="#{credit.credito.idRuta.nombre}" />
+                            <p:column headerText="Ruta" width="20%" sortBy="#{credit.credito.idRuta.nombre}"
+                                      filterBy="#{credit.credito.idRuta.nombre}" filterMatchMode="contains">
+                                <h:outputText value="#{credit.credito.idRuta.nombre}"/>
                             </p:column>
-                            <p:column headerText="Cliente" width="20%">
+
+                            <p:column width="10%" sortBy="#{credit.credito.fechaDesembolso}">
+                                <f:facet name="header"><h:outputText value="Fecha D." title="Fecha Desembolso"/></f:facet>
+                                <h:outputText value="#{credit.credito.fechaDesembolso}" ><f:convertDateTime pattern="dd/MM/yyyy"/></h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Cliente" width="40%">
                                 <h:outputText value="#{credit.credito.idCliente.primerNombre}" rendered="#{not empty credit.credito.idCliente.primerNombre}"/>
                                 <h:outputText value=" #{credit.credito.idCliente.segundoNombre}" rendered="#{not empty credit.credito.idCliente.segundoNombre}"/>
                                 <h:outputText value=" #{credit.credito.idCliente.primerApellido}" rendered="#{not empty credit.credito.idCliente.primerApellido}"/>
                                 <h:outputText value=" #{credit.credito.idCliente.segundoApellido}" rendered="#{not empty credit.credito.idCliente.segundoApellido}"/>
                             </p:column>
 
-                            <p:column filterBy="#{credit.credito.idCredito}" headerText="No. tarjeta" filterMatchMode="startsWith" width="15%">
+                            <p:column filterBy="#{credit.credito.idCredito}" filterMatchMode="exact" 
+                                      width="7%" sortBy="#{credit.credito.idCredito}" >
+                                <f:facet name="header"><h:outputText value="No." title="Numero de tarjeta"/></f:facet>
                                 <h:outputText value="#{credit.credito.idCredito}" />
                             </p:column>
 
-                            <p:column headerText="Cuota" width="10%">
+                            <p:column headerText="Cuota" width="7%">
                                 <p:cellEditor>
                                     <f:facet name="output"><h:outputText value="#{credit.cuota}" /></f:facet>
                                     <f:facet name="input"><p:inputText id="modelInput" value="#{credit.cuota}" style="width:100%"/></f:facet>
                                 </p:cellEditor>
                             </p:column>
 
-                            <p:column headerText="Monto Prestado" width="10%" >
+                            <p:column width="7%" >
+                                <f:facet name="header"><h:outputText value="M. P." title="Monto Prestado" style="color: blue;"/></f:facet>
                                 <h:outputText value="#{credit.credito.monto}" style="color: blue;"/>
                             </p:column>
 
 
-                            <p:column headerText="Abonado" width="10%"  style="color: green;">
+                            <p:column width="7%"  style="color: green;">
+                                <f:facet name="header"><h:outputText value="Abon." title="Abonado"/></f:facet>
                                 <h:outputText value="#{credit.abonado}" />
                             </p:column>
-                            <p:column headerText="Saldo Por Pagar" width="10%" style="color: red;">
+
+                            <p:column headerText="Saldo" width="7%" style="color: red;">
                                 <h:outputText value="#{credit.saldoPorPagar}" />
                             </p:column>
+
+                            <f:facet name="footer">
+                                <p:outputLabel value="Total: #{cuadreView.countCreditos}"/>
+                            </f:facet>
                         </p:dataTable>
                     </p:panel>
                 </p:tab>
 
+                <!-- ***************************************************************************************************************-->
+                <!-- **************************************************** Confirmation *********************************************-->
+                <!-- ***************************************************************************************************************-->
                 <p:tab id="confirmacion" title="Confirmacion" >
                     <p:panel header="Confirmar cuadre">
                         <h:panelGrid id="confirmation" columns="3" >
 
                             <h:panelGrid id="pnlCuadre1" columns="2" columnClasses="label,value">
-                                <p:outputLabel value="Cobro del día:"/><p:inputText value="#{cuadreView.cuadre.cobroDia}" disabled="true"/>
+                                <p:outputLabel value="Fecha:"/>
+                                <h:outputText value="#{cuadreView.cuadre.fechaCreacion}" style="font-weight: bold; color: green;">
+                                    <f:convertDateTime pattern="EEE, dd/MMM/yyyy" locale="es_GT"/></h:outputText>
+                                <p:outputLabel value="Cobro por día:"/><h:outputText value="#{cuadreView.cuadre.cobroDia}"/>
                                 <p:spacer height=""/><p:spacer height=""/>
 
-                                <p:outputLabel value="(+)Base:"/><p:inputText value="#{cuadreView.cuadre.baseDia}" disabled="true"/>
+                                <p:outputLabel value="(+)Base:"/><p:inputText value="#{cuadreView.cuadre.baseDia}">
+                                    <p:ajax listener="#{cuadreView.calcularEfectivo()}" update="efectivo"/></p:inputText>
                                 <p:outputLabel value="(+)Cobrado:"/><p:inputText value="#{cuadreView.cuadre.cobrado}" disabled="true"/>
+                                <p:outputLabel value="(+)Multas:"/><p:inputText value="#{cuadreView.cuadre.multa}" >
+                                    <p:ajax listener="#{cuadreView.calcularEfectivo()}" update="efectivo"/></p:inputText>
+
                                 <p:outputLabel value="(-)Total de gastos:"/><p:inputText value="#{cuadreView.totalGastos}" disabled="true"/>
                                 <p:outputLabel value="(-)Total prestado:"/><p:inputText value="#{cuadreView.totalPrestado}" disabled="true"/>
                                 <p:outputLabel value="Efectivo:"/><p:inputText id="efectivo" value="#{cuadreView.cuadre.efectivo}" disabled="true"/>
@@ -134,7 +181,7 @@
                                     <p:column headerText="Ruta">
                                         #{cpr.ruta.nombre}
                                     </p:column>
-                                    <p:column headerText="Cobrado">
+                                    <p:column headerText="Monto">
                                         #{cpr.cobro}
                                     </p:column>
                                 </p:dataTable>
@@ -142,11 +189,17 @@
 
                         </h:panelGrid>
 
-                        <p:commandButton value="Confirmar" action="#{cuadreView.ingresarCuadre()}" />
+                        <p:commandButton value="Confirmar" action="#{cuadreView.ingresarCuadre()}" >
+                            <p:confirm header="Confirmación" message="Esta seguro que desea confirmar el cuadre?" icon="ui-icon-alert" />
+                        </p:commandButton>
                     </p:panel>
                 </p:tab>
             </p:wizard>
 
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
         </h:form>
     </h:body>
 </html>

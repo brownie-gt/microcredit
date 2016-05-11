@@ -36,8 +36,11 @@
                     
                     <p:panelGrid id="pnlAbono" columns="2" columnClasses="label,value">
                         <p:outputLabel value="Numero de tarjeta:"/><p:outputLabel value="#{creditoView.credito.idCredito}"/>
-                        <p:outputLabel value="Cliente:"/>
-                        <p:outputLabel value="#{creditoView.credito.idCliente.primerNombre} #{creditoView.credito.idCliente.primerApellido} "/>
+                        <p:outputLabel value="Ruta:"/><p:outputLabel value="#{creditoView.credito.idRuta.nombre}"/>
+                        <p:outputLabel value="Nombre:"/>
+                        <p:outputLabel value="#{creditoView.credito.idCliente.primerNombre} #{creditoView.credito.idCliente.segundoNombre}"/>
+                        <p:outputLabel value="Apellido:"/>
+                        <p:outputLabel value="#{creditoView.credito.idCliente.primerApellido} #{creditoView.credito.idCliente.segundoApellido}"/>
                         <p:outputLabel value="Fecha desembolso:"/><p:outputLabel value="#{creditoView.credito.fechaDesembolso}">
                             <f:convertDateTime pattern="dd/MM/yyyy" /></p:outputLabel>
                         <p:outputLabel value="Monto:"/><p:outputLabel value="#{creditoView.credito.monto}" style="color: blue;"/>

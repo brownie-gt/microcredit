@@ -1,9 +1,10 @@
 package com.microcredit.bll;
 
 import com.microcredit.entity.Ruta;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class CobroPorRuta {
+public class CobroPorRuta implements Serializable{
     
     private Ruta ruta;
     private BigDecimal cobro;

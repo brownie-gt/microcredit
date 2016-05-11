@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -24,14 +25,12 @@ import org.primefaces.event.FlowEvent;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ManagedBean(name = "cuadreView")
 @ViewScoped
 public class CuadreBean implements Serializable {
 
-    private static final Logger logger = LoggerFactory.getLogger(CuadreBean.class);
+//    private static final Logger logger = LoggerFactory.getLogger(CuadreBean.class);
     private List<Abono> abonos;
     private List<DetalleCredito> creditosCuadre;
     private List<DetalleCredito> filteredCreditosCuadre;
@@ -52,6 +51,7 @@ public class CuadreBean implements Serializable {
 
     private List<Gasto> gastosDelDia;
     private BigDecimal montoGasto;
+    private String descripcionGasto;
 
     private List<Credito> creditosSeleccionados;
     private int countCreditosSeleccionados;
@@ -96,6 +96,9 @@ public class CuadreBean implements Serializable {
             dc.setCredito(c);
             dc.calcularDetalleCredito();
             if (calcularCobros && !dc.isPagado()) {
+                if (CreditoBean.isNuevoCredito(dc.getCredito().getFechaDesembolso(), cuadre.getFechaCreacion())) {
+                    dc.setCuota(new BigDecimal(0));
+                }
                 creditosCuadre.add(dc);
                 cuadre.setCobroDia(cuadre.getCobroDia().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
                 cuadre.setCobrado(cuadre.getCobrado().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
@@ -106,22 +109,22 @@ public class CuadreBean implements Serializable {
         }
     }
 
-    public void cargarGastosDelDia() {
-        gastosDelDia = GastoBean.getGastosByDate(cartera, cuadre.getFechaCreacion());
-    }
-
     public void agregarGasto() {
-        Gasto g = new Gasto();
-        g.setIdCartera(cartera);
-        g.setFechaCreacion(cuadre.getFechaCreacion());
-        g.setIdTipoGasto(tipoGastoSeleccionado);
-        g.setMonto(montoGasto);
-        if (gastosDelDia == null) {
-            gastosDelDia = new ArrayList<>();
+        if (montoGasto != null) {
+            Gasto g = new Gasto();
+            g.setIdCartera(cartera);
+            g.setFechaCreacion(cuadre.getFechaCreacion());
+            g.setIdTipoGasto(tipoGastoSeleccionado);
+            g.setMonto(montoGasto);
+            g.setDescripcion(descripcionGasto);
+            if (gastosDelDia == null) {
+                gastosDelDia = new ArrayList<>();
+            }
+            gastosDelDia.add(g);
+            montoGasto = null;
+            tipoGastoSeleccionado = null;
+            descripcionGasto = null;
         }
-        gastosDelDia.add(g);
-        montoGasto = null;
-        tipoGastoSeleccionado = null;
     }
 
     private void ingresarGastos(EntityManager em) {
@@ -134,7 +137,7 @@ public class CuadreBean implements Serializable {
 
     private void ingresarAbonos(EntityManager em) {
         for (DetalleCredito dc : creditosCuadre) {
-            if (dc.getCuota().intValue() > 0) {
+            if (dc.getCuota() != null && dc.getCuota().intValue() > 0) {
                 AbonoBean.ingresarAbono(em, dc.getCredito(), dc.getCuota(), cuadre.getFechaCreacion());
             }
         }
@@ -155,10 +158,6 @@ public class CuadreBean implements Serializable {
     public void calcular() {
         List<Credito> creditos = CreditoBean.getCreditosByDate(cartera, cuadre.getFechaCreacion());
         totalPrestado = new BigDecimal(0);
-        BigDecimal ingresos;
-        BigDecimal egresos;
-        BigDecimal efectivo;
-
         calcularCobrado();
         calcularTotalGastos();
 
@@ -166,16 +165,36 @@ public class CuadreBean implements Serializable {
             totalPrestado = totalPrestado.add(c.getMonto()).setScale(0, RoundingMode.HALF_EVEN);
         }
 
+        calcularEfectivo();
+        calcularDiferencia();
+    }
+
+    public void calcularEfectivo() {
+        BigDecimal ingresos;
+        BigDecimal egresos;
+        BigDecimal efectivo;
+
+        if (cuadre.getBaseDia() == null) {
+            cuadre.setBaseDia(new BigDecimal(0));
+        }
+        if (cuadre.getMulta() == null) {
+            cuadre.setMulta(new BigDecimal(0));
+        }
+
         ingresos = cuadre.getBaseDia().add(cuadre.getCobrado()).setScale(0, RoundingMode.HALF_EVEN);
+        ingresos = ingresos.add(cuadre.getMulta()).setScale(0, RoundingMode.HALF_EVEN);
         egresos = totalPrestado.add(totalGastos).setScale(0, RoundingMode.HALF_EVEN);
         efectivo = ingresos.subtract(egresos).setScale(0, RoundingMode.HALF_EVEN);
         cuadre.setEfectivo(efectivo);
-        calcularDiferencia();
+
     }
 
     public void calcularDiferencia() {
         faltante = new BigDecimal(0);
         sobrante = new BigDecimal(0);
+        if (cuadre.getCobroCobrador() == null) {
+            cuadre.setCobroCobrador(new BigDecimal(0));
+        }
         if (cuadre.getCobrado().intValue() > cuadre.getCobroCobrador().intValue()) {
             faltante = cuadre.getCobrado().subtract(cuadre.getCobroCobrador()).setScale(0, RoundingMode.HALF_EVEN);
         } else if (cuadre.getCobrado().intValue() < cuadre.getCobroCobrador().intValue()) {
@@ -187,8 +206,10 @@ public class CuadreBean implements Serializable {
         inicializarCobroPorRutas();
         cuadre.setCobrado(new BigDecimal(0));
         for (DetalleCredito dc : creditosCuadre) {
-            cuadre.setCobrado(cuadre.getCobrado().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
-            calcularCobradoPorRuta(dc);
+            if (dc.getCuota() != null && dc.getCuota().intValue() > 0) {
+                cuadre.setCobrado(cuadre.getCobrado().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
+                calcularCobradoPorRuta(dc);
+            }
         }
     }
 
@@ -391,6 +412,14 @@ public class CuadreBean implements Serializable {
 
     public List<CobroPorRuta> getCobrosPorRuta() {
         return cobrosPorRuta;
+    }
+
+    public String getDescripcionGasto() {
+        return descripcionGasto;
+    }
+
+    public void setDescripcionGasto(String descripcionGasto) {
+        this.descripcionGasto = descripcionGasto;
     }
 
 }

@@ -61,10 +61,8 @@ public class Cuadre implements Serializable {
     private BigDecimal baseDia;
     @Column(name = "EFECTIVO")
     private BigDecimal efectivo;
-//    @Column(name = "FALTANTE")
-//    private BigDecimal faltante;
-//    @Column(name = "SOBRANTE")
-//    private BigDecimal sobrante;
+    @Column(name = "MULTA")
+    private BigDecimal multa;
     @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
     @ManyToOne
     private Cartera idCartera;
@@ -124,22 +122,6 @@ public class Cuadre implements Serializable {
         this.baseDia = baseDia;
     }
 
-//    public BigDecimal getFaltante() {
-//        return faltante;
-//    }
-//
-//    public void setFaltante(BigDecimal faltante) {
-//        this.faltante = faltante;
-//    }
-//
-//    public BigDecimal getSobrante() {
-//        return sobrante;
-//    }
-//
-//    public void setSobrante(BigDecimal sobrante) {
-//        this.sobrante = sobrante;
-//    }
-
     public BigDecimal getEfectivo() {
         return efectivo;
     }
@@ -148,6 +130,14 @@ public class Cuadre implements Serializable {
         this.efectivo = efectivo;
     }
 
+    public BigDecimal getMulta() {
+        return multa;
+    }
+
+    public void setMulta(BigDecimal multa) {
+        this.multa = multa;
+    }
+    
     public Cartera getIdCartera() {
         return idCartera;
     }

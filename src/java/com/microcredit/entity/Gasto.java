@@ -51,6 +51,8 @@ public class Gasto implements Serializable {
     @Basic(optional = false)
     @Column(name = "MONTO")
     private BigDecimal monto;
+    @Column(name = "DESCRIPCION")
+    private String descripcion;
     @JoinColumn(name = "ID_TIPO_GASTO", referencedColumnName = "ID_TIPO_GASTO")
     @ManyToOne(optional = false)
     private TipoGasto idTipoGasto;
@@ -86,7 +88,7 @@ public class Gasto implements Serializable {
     public void setFechaCreacion(Date fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
-
+    
     public BigDecimal getMonto() {
         return monto;
     }
@@ -95,6 +97,14 @@ public class Gasto implements Serializable {
         this.monto = monto;
     }
 
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+    
     public TipoGasto getIdTipoGasto() {
         return idTipoGasto;
     }
