@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <p:tab id="abonos" title="Abonos">
+        <p:messages showDetail="true" autoUpdate="true" closable="true"/>
+        <p:outputLabel value="Seleccionados:" rendered="false"/><p:outputLabel id="cSelec" value="#{cuadreView.countCreditosSeleccionados}" rendered="false"/>
+
+        <p:dataTable id="dtCreditos" var="credit" value="#{cuadreView.creditosCuadre}" editable="true" style="margin-bottom:20px"
+                     selection="#{cuadreView.creditosSeleccionados}" rowKey="#{credit.credito.idCredito}"
+                     filteredValue="#{cuadreView.filteredCreditosCuadre}" editMode="cell" >
+            <f:facet name="header">
+                <h:outputText value="#{cuadreView.cuadre.fechaCreacion}" style="font-weight: bold; color: green;">
+                    <f:convertDateTime pattern="EEE, dd/MMM/yyyy" locale="es_GT"/></h:outputText>
+            </f:facet>
+
+            <p:column selectionMode="multiple" width="5%" style="text-align:center" />
+
+            <p:column headerText="Ruta" width="20%" sortBy="#{credit.credito.idRuta.nombre}"
+                      filterBy="#{credit.credito.idRuta.nombre}" filterMatchMode="contains">
+                <h:outputText value="#{credit.credito.idRuta.nombre}"/>
+            </p:column>
+
+            <p:column width="10%" sortBy="#{credit.credito.fechaDesembolso}">
+                <f:facet name="header"><h:outputText value="Fecha D." title="Fecha Desembolso"/></f:facet>
+                <h:outputText value="#{credit.credito.fechaDesembolso}" ><f:convertDateTime pattern="dd/MM/yyyy"/></h:outputText>
+            </p:column>
+
+            <p:column headerText="Cliente" width="40%" 
+                      filterBy="#{credit.credito.idCliente.primerNombre}||#{credit.credito.idCliente.segundoNombre}||#{credit.credito.idCliente.primerApellido}||#{credit.credito.idCliente.segundoApellido}" 
+                      filterMatchMode="contains" >
+                <h:outputText value="#{credit.credito.idCliente.primerNombre}" rendered="#{not empty credit.credito.idCliente.primerNombre}"/>
+                <h:outputText value=" #{credit.credito.idCliente.segundoNombre}" rendered="#{not empty credit.credito.idCliente.segundoNombre}"/>
+                <h:outputText value=" #{credit.credito.idCliente.primerApellido}" rendered="#{not empty credit.credito.idCliente.primerApellido}"/>
+                <h:outputText value=" #{credit.credito.idCliente.segundoApellido}" rendered="#{not empty credit.credito.idCliente.segundoApellido}"/>
+            </p:column>
+
+            //**************//
+            <p:column id="colNo" filterBy="#{credit.credito.idCredito}" filterMatchMode="exact" 
+                      width="7%" sortBy="#{credit.credito.idCredito}" selectRow="true" >
+                <f:facet name="header"><h:outputText value="No." title="Numero de tarjeta"/></f:facet>
+                <h:outputText value="#{credit.credito.idCredito}" />
+            </p:column>
+
+            <p:column headerText="Cuota" width="7%" style="text-align: right;">
+                <p:cellEditor>
+                    <f:facet name="output"><h:outputText value="#{credit.cuota}" >
+                            <f:convertNumber pattern="###,###"/>
+                        </h:outputText></f:facet>
+                    <f:facet name="input"><p:inputText id="modelInput" value="#{credit.cuota}" style="width:100%"/></f:facet>
+                </p:cellEditor>
+            </p:column>
+
+            <p:column width="7%" style="text-align: right;">
+                <f:facet name="header"><h:outputText value="M. P." title="Monto Prestado" style="color: blue;"/></f:facet>
+                <h:outputText value="#{credit.credito.monto}" style="color: blue; text-align: right;">
+                    <f:convertNumber pattern="###,###"/>
+                </h:outputText>
+
+            </p:column>
+
+            <p:column width="7%"  style="color: green; text-align: right;">
+                <f:facet name="header"><h:outputText value="Abon." title="Abonado"/></f:facet>
+                <h:outputText value="#{credit.abonado}" ><f:convertNumber pattern="###,###"/></h:outputText>
+            </p:column>
+
+            <p:column headerText="Saldo" width="7%" style="color: red; text-align: right;">
+                <h:outputText value="#{credit.saldoPorPagar}" ><f:convertNumber pattern="###,###"/></h:outputText>
+            </p:column>
+
+            <f:facet name="footer">
+                <p:outputLabel value="Total: #{cuadreView.countCreditos}"/>
+            </f:facet>
+        </p:dataTable>
+        
+        <p:commandButton rendered="false" value="Partial" process="formConf:dtCreditos" actionListener="#{cuadreView.printFilterValue()}" />
+        
+    </p:tab>
+
+
+</html>
+

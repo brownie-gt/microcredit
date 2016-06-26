@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    
+    <p:tab id="confirmacion" title="Confirmacion" >
+        <p:panel header="Confirmar cuadre">
+            <h:panelGrid id="confirmation" columns="3" >
+
+                <h:panelGrid id="pnlCuadre1" columns="2" columnClasses="label,value">
+                    <p:outputLabel value="Fecha:"/>
+                    <h:outputText value="#{cuadreView.cuadre.fechaCreacion}" style="font-weight: bold; color: green;">
+                        <f:convertDateTime pattern="EEE, dd/MMM/yyyy" locale="es_GT"/></h:outputText>
+                    <p:outputLabel value="Cobro por día:"/><h:outputText value="#{cuadreView.cuadre.cobroDia}"/>
+                    <p:spacer height=""/><p:spacer height=""/>
+
+                    <p:outputLabel value="(+)Base:"/><p:inputText value="#{cuadreView.cuadre.baseDia}">
+                        <p:ajax listener="#{cuadreView.calcularEfectivo()}" update="efectivo"/></p:inputText>
+                    <p:outputLabel value="(+)Cobrado:"/><p:inputText value="#{cuadreView.cuadre.cobrado}" disabled="true"/>
+                    <p:outputLabel value="(+)Multas:"/><p:inputText value="#{cuadreView.cuadre.multa}" >
+                        <p:ajax listener="#{cuadreView.calcularEfectivo()}" update="efectivo"/></p:inputText>
+
+                    <p:outputLabel value="(-)Total de gastos:"/><p:inputText value="#{cuadreView.totalGastos}" disabled="true"/>
+                    <p:outputLabel value="(-)Total prestado:"/><p:inputText value="#{cuadreView.totalPrestado}" disabled="true"/>
+                    <p:outputLabel value="Efectivo:"/><p:inputText id="efectivo" value="#{cuadreView.cuadre.efectivo}" disabled="true"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="pnlCuadre2" columns="2" columnClasses="label,value">
+                    <p:spacer height=""/><p:spacer height=""/>
+                    <p:outputLabel value="Cobro cobrador:"/><p:inputText value="#{cuadreView.cuadre.cobroCobrador}">
+                        <p:ajax listener="#{cuadreView.calcularDiferencia()}" update="faltante,sobrante"/></p:inputText>
+                    <p:outputLabel value="Faltante:"/><p:inputText id="faltante" value="#{cuadreView.faltante}" disabled="true"/>
+                    <p:outputLabel value="Sobrante:"/><p:inputText id="sobrante" value="#{cuadreView.sobrante}" disabled="true"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="pnlCuadre3" columns="1">
+                    <p:dataTable value="#{cuadreView.cobrosPorRuta}" var="cpr">
+                        <f:facet name="header">Cobrado por rutas</f:facet>
+                        <p:column headerText="Ruta">
+                            #{cpr.ruta.nombre}
+                        </p:column>
+                        <p:column headerText="Monto">
+                            #{cpr.cobro}
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGrid>
+
+            </h:panelGrid>
+
+            <p:commandButton value="Confirmar" action="#{cuadreView.ingresarCuadre()}" >
+                <p:confirm header="Confirmación" message="Esta seguro que desea confirmar el cuadre?" icon="ui-icon-alert" />
+            </p:commandButton>
+        </p:panel>
+    </p:tab>
+
+</html>
+

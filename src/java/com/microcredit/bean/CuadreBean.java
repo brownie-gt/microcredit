@@ -25,6 +25,8 @@ import org.primefaces.event.FlowEvent;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ManagedBean(name = "cuadreView")
 @ViewScoped
@@ -56,6 +58,9 @@ public class CuadreBean implements Serializable {
     private List<Credito> creditosSeleccionados;
     private int countCreditosSeleccionados;
     private int countCreditos;
+    
+    private String filterValue;
+    private static final Logger logger = LoggerFactory.getLogger(CreditoBean.class);
 
     public CuadreBean() {
         cuadre = new Cuadre();
@@ -258,6 +263,10 @@ public class CuadreBean implements Serializable {
         }
         return event.getNewStep();
     }
+    
+    public void printFilterValue(){
+        logger.debug("filterValue: "+filterValue);
+    }
 
     public void onRowSelect(SelectEvent event) {
         countCreditosSeleccionados++;
@@ -268,16 +277,9 @@ public class CuadreBean implements Serializable {
     }
 
     public void onRowEdit(RowEditEvent event) {
-//        DetalleCredito creditoEditado = (DetalleCredito) event.getObject();
-//        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-//                "Cuota editada", "Tarjeta: " + creditoEditado.getCredito().getIdCredito()
-//                + " Cuota: " + creditoEditado.getCuota().toString());
-//        FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
     public void onRowCancel(RowEditEvent event) {
-//        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Edición cancelada", ((DetalleCredito) event.getObject()).getCuota().toString());
-//        FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 
     public List<Abono> getAbonos() {
@@ -420,6 +422,14 @@ public class CuadreBean implements Serializable {
 
     public void setDescripcionGasto(String descripcionGasto) {
         this.descripcionGasto = descripcionGasto;
+    }
+
+    public String getFilterValue() {
+        return filterValue;
+    }
+
+    public void setFilterValue(String filterValue) {
+        this.filterValue = filterValue;
     }
 
 }
