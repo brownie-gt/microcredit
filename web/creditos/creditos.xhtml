@@ -12,21 +12,25 @@
         <ui:include src="/menu/menuBar.xhtml"/>
         <h:form>
             <h:panelGrid columns="3">
-                <p:outputLabel value="Id cartera:"/><p:inputText value="#{cuadreView.idCartera}"/>
+                <p:outputLabel value="Id cartera:"/><p:inputText value="#{cuadreView.idCartera}" size="2"/>
                 <p:commandButton value="Cargar" actionListener="#{cuadreView.cargarCarteraById()}" update="creditos">
                     <f:actionListener binding="#{cuadreView.cargarCreditos(false)}" /></p:commandButton>
+
+                <p:outputLabel value="Cuentas &#10;por cobrar:" style="white-space: pre;"/><p:selectBooleanCheckbox value="#{cuadreView.incluirCuentasPorCobrar}" />
+                <p:column/>
+
             </h:panelGrid>
             <p:spacer height=""/>
             <p:messages/>
-            <p:dataTable id="creditos" var="c" value="#{cuadreView.creditosCuadre}" editable="true">
+            <p:dataTable id="creditos" var="c" value="#{cuadreView.creditosCuadre}" editable="true" stickyHeader="true">
                 <p:ajax event="rowEdit" listener="#{creditoView.onRowEdit}" />
                 <p:ajax event="rowEditCancel" listener="#{creditoView.onRowCancel}" />
-                
+
                 <f:facet name="header">
                     Creditos
                 </f:facet>
-                
-                <p:column headerText="Fecha Desembolso" width="9%">
+
+                <p:column headerText="Fecha Desembolso" width="7%">
                     <p:cellEditor>
                         <f:facet name="output"> <h:outputText value="#{c.credito.fechaDesembolso}" >
                                 <f:convertDateTime pattern="dd/MM/yyyy"/>
@@ -35,7 +39,7 @@
                         </f:facet>
                     </p:cellEditor>
                 </p:column>
-                
+
                 <p:column style="width:15px">
                     <p:rowEditor />
                 </p:column>
@@ -43,36 +47,51 @@
                 <p:column headerText="Ruta" width="10%">
                     <h:outputText value="#{c.credito.idRuta.nombre}" />
                 </p:column>
-                <p:column headerText="Cliente" width="16%">
+
+                <p:column headerText="Cliente" width="24%">
                     <h:outputText value="#{c.credito.idCliente.primerNombre}" rendered="#{not empty c.credito.idCliente.primerNombre}"/>
                     <h:outputText value="#{c.credito.idCliente.segundoNombre}" rendered="#{not empty c.credito.idCliente.segundoNombre}"/>
                     <h:outputText value=" #{c.credito.idCliente.primerApellido}" rendered="#{not empty c.credito.idCliente.primerApellido}"/>
                     <h:outputText value="#{c.credito.idCliente.segundoApellido}" rendered="#{not empty c.credito.idCliente.segundoApellido}"/>
                 </p:column>
-                <p:column headerText="Id Credito" width="5%">
+
+                <p:column headerText="Num. Tarjeta" width="5%" style="text-align: center;">
                     <h:outputText value="#{c.credito.idCredito}" />
                 </p:column>
-                <p:column headerText="Cuota" width="5%">
-                    <h:outputText value="#{c.cuota}" />
-                </p:column>
-                <p:column headerText="Abonos" width="5%">
+
+                <p:column headerText="Abonos" width="5%" style="text-align: center;">
                     <h:outputText value="#{c.numeroAbonos}" />
                 </p:column>
-                <p:column headerText="Monto" width="5%"  style="color: blue;">
-                    <h:outputText value="#{c.credito.monto}" />
+
+                <p:column headerText="Monto" width="6%"  style="color: blue; text-align: center;">
+                    <h:outputText value="#{c.credito.monto}" ><f:convertNumber pattern="###,###"/></h:outputText>
                 </p:column>
-                <p:column headerText="Interes" width="5%">
-                    <h:outputText value="#{c.interes}" />
+
+                <p:column headerText="Interes" width="6%" style="text-align: center;">
+                    <h:outputText value="#{c.interes}" ><f:convertNumber pattern="###,###"/></h:outputText>
                 </p:column>
-                <p:column headerText="Abonado" width="6%"  style="color: green;">
-                    <h:outputText value="#{c.abonado}" />
+
+                <p:column headerText="Abonado" width="6%"  style="color: green; text-align: center;">
+                    <h:outputText value="#{c.abonado}" ><f:convertNumber pattern="###,###"/></h:outputText>
                 </p:column>
-                <p:column headerText="Saldo por pagar" width="4%" style="color: red;">
-                    <h:outputText value="#{c.saldoPorPagar}" />
+
+                <p:column headerText="Saldo por pagar" width="6%" style="color: red; text-align: center;">
+                    <h:outputText value="#{c.saldoPorPagar}" ><f:convertNumber pattern="###,###"/></h:outputText>
                 </p:column>
-                <p:column headerText="Total a pagar" width="5%">
-                    <h:outputText value="#{c.totalAPagar}" />
-                </p:column>
+
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="6" style="text-align:right" footerText="Totales:" />
+                        <p:column footerText="#{cuadreView.totalPrestamos}" />
+                        <p:column footerText="#{cuadreView.totalInteres}" />
+                        <p:column footerText="#{cuadreView.totalAbonado}" />
+                        <p:column footerText="#{cuadreView.totalPorCobrar}" />                    
+                    </p:row>
+                </p:columnGroup>
+
+                <f:facet name="footer">
+                    <p:outputLabel value="Creditos: #{cuadreView.countCreditos}"/>
+                </f:facet>
             </p:dataTable>
         </h:form>
     </h:body>

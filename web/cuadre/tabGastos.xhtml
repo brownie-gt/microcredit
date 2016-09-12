@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+
+    <p:tab id="tabGastos" title="Gastos">
+        
+        <p:panel id="pnlGastos" header="Ingresar Gastos">
+            <h:panelGrid columns="4">
+                <p:outputLabel for="tipoGasto" value="Tipo:" />
+                <h:selectOneMenu id="tipoGasto" value="#{cuadreView.tipoGastoSeleccionado}" converter="tipoGastoConverter">
+                    <f:selectItem itemLabel="Seleccionar..." value="#{null}"/>
+                    <f:selectItems value="#{cuadreView.listTipoGasto}" var="tg" itemValue="#{tg}" itemLabel="#{tg.descripcion}"/>
+                </h:selectOneMenu>
+                <p:column/><p:column/>
+                <p:outputLabel value="Monto:"/><p:inputText value="#{cuadreView.montoGasto}"/>
+                <p:column/><p:column/>
+                <p:outputLabel value="Descripción:"/><p:inputText value="#{cuadreView.descripcionGasto}"/>
+                <p:commandButton value="Ingresar" actionListener="#{cuadreView.agregarGasto()}" update="pnlGastos"/>
+            </h:panelGrid>
+            <p:spacer height=""/>
+            <p:dataTable id="dtGastos" var="gast" value="#{cuadreView.gastosDelDia}" >
+                <f:facet name="header">
+                    Gastos
+                </f:facet>
+                <p:column headerText="Monto">
+                    <h:outputText value="#{gast.monto}" />
+                </p:column>
+                <p:column headerText="Tipo">
+                    <h:outputText value="#{gast.idTipoGasto.descripcion}" />
+                </p:column>
+                <p:column headerText="Descripción">
+                    <h:outputText value="#{gast.descripcion}" />
+                </p:column>
+            </p:dataTable>
+        </p:panel>
+    </p:tab>
+</html>
+

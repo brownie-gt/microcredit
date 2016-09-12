@@ -12,8 +12,8 @@ import com.microcredit.entity.TipoGasto;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -55,11 +55,13 @@ public class CuadreBean implements Serializable {
     private BigDecimal montoGasto;
     private String descripcionGasto;
 
-    private List<Credito> creditosSeleccionados;
+    private String filterIdCredito;
+    private List<DetalleCredito> creditosSeleccionados;
     private int countCreditosSeleccionados;
     private int countCreditos;
-    
-    private String filterValue;
+
+    private boolean incluirCuentasPorCobrar;
+
     private static final Logger logger = LoggerFactory.getLogger(CreditoBean.class);
 
     public CuadreBean() {
@@ -109,13 +111,59 @@ public class CuadreBean implements Serializable {
                 cuadre.setCobrado(cuadre.getCobrado().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
                 countCreditos++;
             } else if (!calcularCobros) {
-                creditosCuadre.add(dc);
+                if (!incluirCuentasPorCobrar && dc.isPagado()) {
+                    creditosCuadre.add(dc);
+                    countCreditos++;
+                } else if (incluirCuentasPorCobrar) {
+                    creditosCuadre.add(dc);
+                    countCreditos++;
+                }
             }
         }
     }
 
+    public String getTotalPrestamos() {
+        int total = 0;
+        if (creditosCuadre != null && creditosCuadre.size() > 0) {
+            for (DetalleCredito credito : creditosCuadre) {
+                total += credito.getCredito().getMonto().intValue();
+            }
+        }
+        return new DecimalFormat("###,###").format(total);
+    }
+
+    public String getTotalInteres() {
+        int total = 0;
+        if (creditosCuadre != null && creditosCuadre.size() > 0) {
+            for (DetalleCredito credito : creditosCuadre) {
+                total += credito.getInteres().intValue();
+            }
+        }
+        return new DecimalFormat("###,###").format(total);
+    }
+
+    public String getTotalAbonado() {
+        int total = 0;
+        if (creditosCuadre != null && creditosCuadre.size() > 0) {
+            for (DetalleCredito credito : creditosCuadre) {
+                total += credito.getAbonado().intValue();
+            }
+        }
+        return new DecimalFormat("###,###").format(total);
+    }
+
+    public String getTotalPorCobrar() {
+        int total = 0;
+        if (creditosCuadre != null && creditosCuadre.size() > 0) {
+            for (DetalleCredito credito : creditosCuadre) {
+                total += credito.getSaldoPorPagar().intValue();
+            }
+        }
+        return new DecimalFormat("###,###").format(total);
+    }
+
     public void agregarGasto() {
-        if (montoGasto != null) {
+        if (montoGasto != null || tipoGastoSeleccionado != null) {
             Gasto g = new Gasto();
             g.setIdCartera(cartera);
             g.setFechaCreacion(cuadre.getFechaCreacion());
@@ -135,7 +183,7 @@ public class CuadreBean implements Serializable {
     private void ingresarGastos(EntityManager em) {
         if (gastosDelDia != null) {
             for (Gasto g : gastosDelDia) {
-                GastoBean.ingresarGasto(em, cartera, cuadre.getFechaCreacion(), g.getMonto(), g.getIdTipoGasto());
+                GastoBean.ingresarGasto(em, cartera, cuadre.getFechaCreacion(), g);
             }
         }
     }
@@ -252,8 +300,24 @@ public class CuadreBean implements Serializable {
         }
     }
 
+    public void marcarAbono() {
+        if (filterIdCredito != null && filterIdCredito.length() > 0) {
+            try {
+                for (DetalleCredito dc : creditosCuadre) {
+                    if (dc.getCredito().getIdCredito().intValue() == Integer.valueOf(filterIdCredito)) {
+                        getCreditosSeleccionados().add(dc);
+                        filterIdCredito = "";
+                        break;
+                    }
+                }
+            } catch (NumberFormatException e) {
+                logger.warn("Id filtro incorrecto", e);
+            }
+        }
+    }
+
     public String onFlowProcess(FlowEvent event) {
-        if (event.getNewStep().equalsIgnoreCase("abonos") && event.getOldStep().equalsIgnoreCase("cartera")) {
+        if (event.getNewStep().equalsIgnoreCase("abonos") && event.getOldStep().equalsIgnoreCase("tabGastos")) {
             if (creditosCuadre == null) {
                 cargarCreditos(true);
             }
@@ -263,17 +327,13 @@ public class CuadreBean implements Serializable {
         }
         return event.getNewStep();
     }
-    
-    public void printFilterValue(){
-        logger.debug("filterValue: "+filterValue);
-    }
 
     public void onRowSelect(SelectEvent event) {
-        countCreditosSeleccionados++;
+//        countCreditosSeleccionados++;
     }
 
     public void onRowUnselect(UnselectEvent event) {
-        countCreditosSeleccionados--;
+//        countCreditosSeleccionados--;
     }
 
     public void onRowEdit(RowEditEvent event) {
@@ -388,11 +448,11 @@ public class CuadreBean implements Serializable {
         this.countCreditos = countCreditos;
     }
 
-    public List<Credito> getCreditosSeleccionados() {
+    public List<DetalleCredito> getCreditosSeleccionados() {
         return creditosSeleccionados;
     }
 
-    public void setCreditosSeleccionados(List<Credito> creditosSeleccionados) {
+    public void setCreditosSeleccionados(List<DetalleCredito> creditosSeleccionados) {
         this.creditosSeleccionados = creditosSeleccionados;
     }
 
@@ -424,12 +484,19 @@ public class CuadreBean implements Serializable {
         this.descripcionGasto = descripcionGasto;
     }
 
-    public String getFilterValue() {
-        return filterValue;
+    public String getFilterIdCredito() {
+        return filterIdCredito;
     }
 
-    public void setFilterValue(String filterValue) {
-        this.filterValue = filterValue;
+    public void setFilterIdCredito(String filterIdCredito) {
+        this.filterIdCredito = filterIdCredito;
     }
 
+    public boolean isIncluirCuentasPorCobrar() {
+        return incluirCuentasPorCobrar;
+    }
+
+    public void setIncluirCuentasPorCobrar(boolean incluirCuentasPorCobrar) {
+        this.incluirCuentasPorCobrar = incluirCuentasPorCobrar;
+    }
 }

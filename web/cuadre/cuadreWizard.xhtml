@@ -10,23 +10,26 @@
             window.onbeforeunload = function (e) {
                 e = e || window.event;
 
-//                if (e) {
-//                    e.returnValue = 'Esta seguro que desea salir?';
-//                }
-//
-//                return 'Esta seguro que desea salir?';
+                if (e) {
+                    e.returnValue = 'Esta seguro que desea salir?';
+                }
+
+                return 'Esta seguro que desea salir?';
             };
         </script>
     </h:head>
     <h:body>
         <ui:include src="/menu/menuBar.xhtml"/>
         <p:tooltip />
-        <h:form id="formConf">
-
+        <h:form id="formCuadre">
+            <p:messages id="msgs" autoUpdate="true" closable="true" />
             <p:wizard flowListener="#{cuadreView.onFlowProcess}" backLabel="Atrás" nextLabel="Siguiente">
 
                 <!-- ********************************************* Cartera **********************************************************-->
                 <ui:include src="/cuadre/tabCartera.xhtml"/>
+
+                <!-- ********************************************* Gastos **********************************************************-->
+                <ui:include src="/cuadre/tabGastos.xhtml"/>
 
                 <!-- ********************************************* Abonos **********************************************************-->
                 <ui:include src="/cuadre/tabAbonos.xhtml"/>

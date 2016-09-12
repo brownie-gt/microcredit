@@ -156,8 +156,9 @@ public class CreditoBean extends DetalleCredito implements Serializable {
         List<Cliente> filteredClientes = new ArrayList<>();
         for (Cliente c : allClientes) {
             if ((c.getPrimerNombre() != null && c.getPrimerNombre().toLowerCase().contains(query))
+                    || (c.getSegundoNombre() != null && c.getSegundoNombre().toLowerCase().contains(query))
                     || (c.getPrimerApellido() != null && c.getPrimerApellido().toLowerCase().contains(query))
-                    || c.getIdCliente().toString().startsWith(query)) {
+                    || (c.getSegundoApellido()!= null && c.getSegundoApellido().toLowerCase().contains(query))) {
                 filteredClientes.add(c);
             }
         }

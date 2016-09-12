@@ -7,11 +7,14 @@
 
     <p:tab id="abonos" title="Abonos">
         <p:messages showDetail="true" autoUpdate="true" closable="true"/>
-        <p:outputLabel value="Seleccionados:" rendered="false"/><p:outputLabel id="cSelec" value="#{cuadreView.countCreditosSeleccionados}" rendered="false"/>
+        
 
-        <p:dataTable id="dtCreditos" var="credit" value="#{cuadreView.creditosCuadre}" editable="true" style="margin-bottom:20px"
+        <p:dataTable id="dtAbonos" var="credit" value="#{cuadreView.creditosCuadre}" editable="true" style="margin-bottom:20px"
                      selection="#{cuadreView.creditosSeleccionados}" rowKey="#{credit.credito.idCredito}"
-                     filteredValue="#{cuadreView.filteredCreditosCuadre}" editMode="cell" >
+                     filteredValue="#{cuadreView.filteredCreditosCuadre}" editMode="cell" 
+                     widgetVar="wvAbonos"> 
+                
+
             <f:facet name="header">
                 <h:outputText value="#{cuadreView.cuadre.fechaCreacion}" style="font-weight: bold; color: green;">
                     <f:convertDateTime pattern="EEE, dd/MMM/yyyy" locale="es_GT"/></h:outputText>
@@ -19,7 +22,7 @@
 
             <p:column selectionMode="multiple" width="5%" style="text-align:center" />
 
-            <p:column headerText="Ruta" width="20%" sortBy="#{credit.credito.idRuta.nombre}"
+            <p:column headerText="Ruta" width="18%" sortBy="#{credit.credito.idRuta.nombre}"
                       filterBy="#{credit.credito.idRuta.nombre}" filterMatchMode="contains">
                 <h:outputText value="#{credit.credito.idRuta.nombre}"/>
             </p:column>
@@ -29,7 +32,7 @@
                 <h:outputText value="#{credit.credito.fechaDesembolso}" ><f:convertDateTime pattern="dd/MM/yyyy"/></h:outputText>
             </p:column>
 
-            <p:column headerText="Cliente" width="40%" 
+            <p:column headerText="Cliente" width="36%" 
                       filterBy="#{credit.credito.idCliente.primerNombre}||#{credit.credito.idCliente.segundoNombre}||#{credit.credito.idCliente.primerApellido}||#{credit.credito.idCliente.segundoApellido}" 
                       filterMatchMode="contains" >
                 <h:outputText value="#{credit.credito.idCliente.primerNombre}" rendered="#{not empty credit.credito.idCliente.primerNombre}"/>
@@ -38,9 +41,9 @@
                 <h:outputText value=" #{credit.credito.idCliente.segundoApellido}" rendered="#{not empty credit.credito.idCliente.segundoApellido}"/>
             </p:column>
 
-            //**************//
             <p:column id="colNo" filterBy="#{credit.credito.idCredito}" filterMatchMode="exact" 
-                      width="7%" sortBy="#{credit.credito.idCredito}" selectRow="true" >
+                      width="7%" sortBy="#{credit.credito.idCredito}" selectRow="true" 
+                      filterValue="#{cuadreView.filterIdCredito}" filterStyle="width:80%;">
                 <f:facet name="header"><h:outputText value="No." title="Numero de tarjeta"/></f:facet>
                 <h:outputText value="#{credit.credito.idCredito}" />
             </p:column>
@@ -59,7 +62,13 @@
                 <h:outputText value="#{credit.credito.monto}" style="color: blue; text-align: right;">
                     <f:convertNumber pattern="###,###"/>
                 </h:outputText>
+            </p:column>
 
+            <p:column width="6%" style="text-align: right;">
+                <f:facet name="header"><h:outputText value="Int." title="Interés" /></f:facet>
+                <h:outputText value="#{credit.interes}" style="text-align: right;">
+                    <f:convertNumber pattern="###,###"/>
+                </h:outputText>
             </p:column>
 
             <p:column width="7%"  style="color: green; text-align: right;">
@@ -67,17 +76,31 @@
                 <h:outputText value="#{credit.abonado}" ><f:convertNumber pattern="###,###"/></h:outputText>
             </p:column>
 
-            <p:column headerText="Saldo" width="7%" style="color: red; text-align: right;">
+            <p:column width="7%" style="color: red; text-align: right;">
+                <f:facet name="header"><h:outputText value="Saldo" title="Saldo por cobrar" /></f:facet>
                 <h:outputText value="#{credit.saldoPorPagar}" ><f:convertNumber pattern="###,###"/></h:outputText>
             </p:column>
 
+            <p:columnGroup type="footer">
+                <p:row>
+                    <p:column colspan="6" style="text-align:right" footerText="Totales:" />
+                    <p:column footerText="#{cuadreView.totalPrestamos}" />
+                    <p:column footerText="#{cuadreView.totalInteres}" />
+                    <p:column footerText="#{cuadreView.totalAbonado}" />
+                    <p:column footerText="#{cuadreView.totalPorCobrar}" />                    
+                </p:row>
+            </p:columnGroup>
+
             <f:facet name="footer">
-                <p:outputLabel value="Total: #{cuadreView.countCreditos}"/>
+                <p:outputLabel value="Creditos: #{cuadreView.countCreditos}"/>
             </f:facet>
         </p:dataTable>
-        
-        <p:commandButton rendered="false" value="Partial" process="formConf:dtCreditos" actionListener="#{cuadreView.printFilterValue()}" />
-        
+
+        <p:defaultCommand target="marcarAbono" />
+        <p:commandButton id="marcarAbono" value="Marcar Abono" actionListener="#{cuadreView.marcarAbono()}" 
+                         oncomplete="PF('wvAbonos').clearFilters()" update="dtAbonos,idCreditoFocus" >
+            <p:focus id="idCreditoFocus" context="formCuadre:dtAbonos:colNo"/></p:commandButton>
+
     </p:tab>
 
 

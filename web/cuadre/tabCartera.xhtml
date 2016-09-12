@@ -8,7 +8,7 @@
 
     <p:tab id="cartera" title="Cartera">
         <p:panel header="Seleccionar cartera">
-            <p:messages id="msgs" autoUpdate="true" closable="true" />
+            
             <h:panelGrid columns="2">
 
                 <p:outputLabel value="Codigo de cartera:"/><p:inputText value="#{cuadreView.idCartera}" required="true" requiredMessage="Codigo de cartera requerido">
@@ -21,35 +21,6 @@
             </h:panelGrid>
         </p:panel>
 
-        <p:panel id="pnlGastos" header="Ingresar Gastos">
-            <h:panelGrid columns="4">
-                <p:outputLabel for="tipoGasto" value="Tipo:" />
-                <h:selectOneMenu id="tipoGasto" value="#{cuadreView.tipoGastoSeleccionado}" converter="tipoGastoConverter">
-                    <f:selectItem itemLabel="Seleccionar..." value="#{null}"/>
-                    <f:selectItems value="#{cuadreView.listTipoGasto}" var="tg" itemValue="#{tg}" itemLabel="#{tg.descripcion}"/>
-                </h:selectOneMenu>
-                <p:column/><p:column/>
-                <p:outputLabel value="Monto:"/><p:inputText value="#{cuadreView.montoGasto}"/>
-                <p:column/><p:column/>
-                <p:outputLabel value="Descripción:"/><p:inputText value="#{cuadreView.descripcionGasto}"/>
-                <p:commandButton value="Ingresar" actionListener="#{cuadreView.agregarGasto()}" update="pnlGastos"/>
-            </h:panelGrid>
-            <p:spacer height=""/>
-            <p:dataTable id="dtGastos" var="gast" value="#{cuadreView.gastosDelDia}" >
-                <f:facet name="header">
-                    Gastos
-                </f:facet>
-                <p:column headerText="Monto">
-                    <h:outputText value="#{gast.monto}" />
-                </p:column>
-                <p:column headerText="Tipo">
-                    <h:outputText value="#{gast.idTipoGasto.descripcion}" />
-                </p:column>
-                <p:column headerText="Descripción">
-                    <h:outputText value="#{gast.descripcion}" />
-                </p:column>
-            </p:dataTable>
-        </p:panel>
     </p:tab>
 </html>
 
