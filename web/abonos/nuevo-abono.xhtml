@@ -21,7 +21,8 @@
                         <p:outputLabel value="Numero de tarjeta:"/>
                         <p:inputText id="idCredito" value="#{creditoView.idCredito}" />
                         <p:commandButton value="Buscar" actionListener="#{creditoView.cargarCreditoById}" update="pnlAbono,tbAbonos" process="@this,idCredito"/>
-                        <p:spacer width=""/> <p:spacer width=""/> <p:spacer width=""/>
+                        
+                        <p:commandButton value="Eliminar" actionListener="#{creditoView.eliminarCredito()}" update="pnlAbono,tbAbonos" process="@this,idCredito"/> <p:spacer width=""/> <p:spacer width=""/>
 
                         <p:outputLabel for="montoAbonar" value="Monto de abono:"/>
                         <p:inputText id="montoAbonar" value="#{creditoView.montoAbonar}" required="true" />

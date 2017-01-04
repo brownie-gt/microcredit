@@ -7,7 +7,7 @@
 
 
     <p:tab id="tabGastos" title="Gastos">
-        
+
         <p:panel id="pnlGastos" header="Ingresar Gastos">
             <h:panelGrid columns="4">
                 <p:outputLabel for="tipoGasto" value="Tipo:" />
@@ -20,9 +20,11 @@
                 <p:column/><p:column/>
                 <p:outputLabel value="Descripción:"/><p:inputText value="#{cuadreView.descripcionGasto}"/>
                 <p:commandButton value="Ingresar" actionListener="#{cuadreView.agregarGasto()}" update="pnlGastos"/>
+                <p:commandButton value="Borrar gastos" actionListener="#{cuadreView.borrarGastos()}" update="dtGastos"/>
             </h:panelGrid>
             <p:spacer height=""/>
-            <p:dataTable id="dtGastos" var="gast" value="#{cuadreView.gastosDelDia}" >
+
+            <p:dataTable id="dtGastos" var="gast" value="#{cuadreView.gastosDelDia}">
                 <f:facet name="header">
                     Gastos
                 </f:facet>

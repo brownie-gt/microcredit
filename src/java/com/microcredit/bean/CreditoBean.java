@@ -7,6 +7,7 @@ import com.microcredit.dao.DetalleCredito;
 import com.microcredit.entity.Cartera;
 import com.microcredit.entity.Cliente;
 import com.microcredit.entity.Credito;
+import com.microcredit.entity.CreditoEliminado;
 import com.microcredit.entity.Ruta;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -52,6 +53,16 @@ public class CreditoBean extends DetalleCredito implements Serializable {
     public void init() {
         cargarRutas();
         setCredito(new Credito());
+    }
+
+    public static List<Credito> getAllCreditos(Cartera cartera) {
+        EntityManager em = JPA.getEntityManager();
+        em.getTransaction().begin();
+        Query query = em.createQuery("Select cre FROM Credito cre JOIN cre.idRuta.idCartera c WHERE c.idCartera = :idCartera");
+        query.setParameter("idCartera", cartera.getIdCartera());
+        List<Credito> lista = query.getResultList();
+        em.close();
+        return lista;
     }
 
     public String ingresarCredito() {
@@ -101,6 +112,24 @@ public class CreditoBean extends DetalleCredito implements Serializable {
         } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Credito invalido."));
         }
+    }
+
+    public void eliminarCredito() {
+        EntityManager em = JPA.getEntityManager();
+        em.getTransaction().begin();
+        Credito c = em.find(Credito.class, idCredito);
+
+        CreditoEliminado ce = new CreditoEliminado();
+        ce.setIdCredito(c.getIdCredito());
+        ce.setIdCliente(c.getIdCliente().getIdCliente());
+        ce.setIdRuta(c.getIdRuta().getIdRuta());
+        ce.setMonto(c.getMonto());
+        ce.setFechaDesembolso(c.getFechaDesembolso());
+        ce.setFechaEliminado(new Date());
+        em.persist(ce);
+        em.remove(c);
+        em.getTransaction().commit();
+        em.close();
     }
 
     public void onRowEdit(RowEditEvent event) {
@@ -158,7 +187,7 @@ public class CreditoBean extends DetalleCredito implements Serializable {
             if ((c.getPrimerNombre() != null && c.getPrimerNombre().toLowerCase().contains(query))
                     || (c.getSegundoNombre() != null && c.getSegundoNombre().toLowerCase().contains(query))
                     || (c.getPrimerApellido() != null && c.getPrimerApellido().toLowerCase().contains(query))
-                    || (c.getSegundoApellido()!= null && c.getSegundoApellido().toLowerCase().contains(query))) {
+                    || (c.getSegundoApellido() != null && c.getSegundoApellido().toLowerCase().contains(query))) {
                 filteredClientes.add(c);
             }
         }

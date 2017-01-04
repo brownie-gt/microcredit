@@ -10,12 +10,11 @@ import com.microcredit.bll.JPA;
 import com.microcredit.entity.Cliente;
 import com.microcredit.entity.ReferenciaCliente;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.RequestScoped;
+import javax.faces.bean.ViewScoped;
 import javax.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author 30178037
  */
 @ManagedBean(name = "cliente")
-@RequestScoped
+@ViewScoped
 public class ClienteBean implements Serializable {
 
     @ManagedProperty("#{clienteService}")
@@ -42,25 +41,25 @@ public class ClienteBean implements Serializable {
         ref2 = new ReferenciaCliente();
     }
 
-    public String ingresarCliente() {
-        List<ReferenciaCliente> referencias = new ArrayList<>();
-        ref1.setIdCliente(cliente);
-        ref2.setIdCliente(cliente);
-        referencias.add(ref1);
-        referencias.add(ref2);
-
-        cliente.setReferenciaClienteList(referencias);
-        cliente.setFechaCreacion(new Date());
-
+    public void ingresarCliente() {
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
+        cliente.setFechaCreacion(new Date());
         em.persist(cliente);
+
+        if (ref1 != null && ref1.getTelefono() != null) {
+            ref1.setIdCliente(cliente);
+            em.persist(ref1);
+        }
+        if (ref2 != null && ref2.getTelefono() != null) {
+            ref1.setIdCliente(cliente);
+            em.persist(ref2);
+        }
+
         em.getTransaction().commit();
         em.close();
-        cliente = new Cliente();
+        limpiar();
         service.init();
-        clientes = null;
-        return "/index";
     }
 
     public List<Cliente> getClientes() {
@@ -70,6 +69,12 @@ public class ClienteBean implements Serializable {
         }
         return clientes;
     }
+    
+    public void limpiar(){
+        cliente = new Cliente();
+        ref1 = new ReferenciaCliente();
+        ref2 = new ReferenciaCliente();
+    }           
 
     public void setClientes(List<Cliente> clientes) {
         this.clientes = clientes;

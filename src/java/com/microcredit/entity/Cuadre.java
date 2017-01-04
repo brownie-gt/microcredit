@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Cuadre.findByCobroDia", query = "SELECT c FROM Cuadre c WHERE c.cobroDia = :cobroDia"),
     @NamedQuery(name = "Cuadre.findByCobrado", query = "SELECT c FROM Cuadre c WHERE c.cobrado = :cobrado"),
     @NamedQuery(name = "Cuadre.findByBaseDia", query = "SELECT c FROM Cuadre c WHERE c.baseDia = :baseDia"),
+    @NamedQuery(name = "Cuadre.findLastCuadre", query = "SELECT c from Cuadre c JOIN c.idCartera cart WHERE cart.idCartera = :idCartera ORDER BY c.idCuadre DESC"),
     @NamedQuery(name = "Cuadre.findByEfectivo", query = "SELECT c FROM Cuadre c WHERE c.efectivo = :efectivo")})
 public class Cuadre implements Serializable {
 

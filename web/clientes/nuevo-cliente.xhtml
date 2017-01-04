@@ -12,7 +12,7 @@
         <h:form id="formCliente">
             <p:panel id="panel" header="Nuevo cliente">
                 <p:messages/>
-                <h:panelGrid columns="3" width="80%" >
+                <h:panelGrid columns="3" width="80%" id="pnlCliente">
                     <h:panelGrid columns="2" columnClasses="label,value">
                         <p:outputLabel for="primerNombre" value="Primer nombre:"/>
                         <p:inputText id="primerNombre" value="#{cliente.cliente.primerNombre}" required="true"/>
@@ -40,10 +40,8 @@
                     </h:panelGrid>
                 </h:panelGrid>
                 <p:spacer height="50px"/>
-                <p:commandButton value="Crear" action="#{cliente.ingresarCliente()}" resetValues="true" update="formCliente:panel" />
-                <p:commandButton value="Limpiar">
-                    <p:ajax update="formCliente:panel" resetValues="true" />
-                </p:commandButton>
+                <p:commandButton value="Crear" actionListener="#{cliente.ingresarCliente()}" update="formCliente:panel" />
+                <p:commandButton value="Limpiar" actionListener="#{cliente.limpiar()}" update="formCliente:panel" />
             </p:panel>
         </h:form>
     </h:body>

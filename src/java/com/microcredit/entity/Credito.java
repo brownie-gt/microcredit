@@ -40,25 +40,33 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Credito.findByMonto", query = "SELECT c FROM Credito c WHERE c.monto = :monto"),
     @NamedQuery(name = "Credito.findByFechaDesembolso", query = "SELECT c FROM Credito c WHERE c.fechaDesembolso = :fechaDesembolso")})
 public class Credito implements Serializable {
+    
     @Basic(optional = false)
     @Column(name = "MONTO")
     private BigDecimal monto;
+    
     @JoinColumn(name = "ID_RUTA", referencedColumnName = "ID_RUTA")
     @ManyToOne(optional = false)
     private Ruta idRuta;
+    
     @JoinColumn(name = "ID_CLIENTE", referencedColumnName = "ID_CLIENTE")
     @ManyToOne(optional = false)
     private Cliente idCliente;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCredito")
     private List<Mora> moraList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCredito")
     private List<Abono> abonoList;
+    
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    
     @Id
     @Basic(optional = false)
     @Column(name = "ID_CREDITO")
     private BigDecimal idCredito;
+    
     @Basic(optional = false)
     @Column(name = "FECHA_DESEMBOLSO")
     @Temporal(TemporalType.DATE)

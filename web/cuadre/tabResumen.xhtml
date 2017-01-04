@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <p:tab id="tabResumen" title="Resumen" >
+        <p:panel id="pnlResumen" style="text-align: center">
+
+            <p:panelGrid>
+                <f:facet name="header" >
+                    <p:row>
+                        <p:column colspan="6" style="padding: 10px">  
+                            <h:outputText value="#{cuadreView.cuadre.fechaCreacion}" style="font-weight: bold; color: blue">
+                                <f:convertDateTime pattern="EEE, dd/MMM/yyyy" locale="es_GT"/></h:outputText>
+                        </p:column>
+                    </p:row>
+                </f:facet>
+
+                <p:row>
+                    <p:column style="color: green; text-align: right">
+                        <p:outputLabel value="(+) Base:" />                        
+                    </p:column>
+                    <p:column style="text-align: left">
+                        <p:inputText value="#{cuadreView.cuadre.baseDia}" size="5"><f:convertNumber pattern="###,###"/></p:inputText>
+                    </p:column>
+                    <p:column style="color: red; text-align: right">
+                        <p:outputLabel value="(-) Total de gastos:"/>
+                    </p:column>
+                    <p:column style="text-align: left">
+                        <p:inputText value="#{cuadreView.totalGastos}" disabled="true" size="5"><f:convertNumber pattern="###,###"/></p:inputText>
+                    </p:column>
+                    <p:column style="text-align: right">
+                        <p:outputLabel value="Cobro cobrador:"/>
+                    </p:column>
+                    <p:column style="text-align: left">
+                        <p:inputText value="#{cuadreView.cuadre.cobroCobrador}" size="5"/>
+                    </p:column>
+                </p:row>
+
+                <p:row>
+                    <p:column style="color: green; text-align: right">
+                        <p:outputLabel value="(+) Cobrado:"/>
+                    </p:column>
+                    <p:column style="text-align: left">
+                        <p:inputText value="#{cuadreView.cuadre.cobrado}" disabled="true" size="5"><f:convertNumber pattern="###,###"/></p:inputText>
+                    </p:column>
+                    <p:column style="color: red; text-align: right">
+                        <p:outputLabel value="(-) Total prestado:"/>
+                    </p:column>
+                    <p:column style="text-align: left">
+                        <p:inputText value="#{cuadreView.totalPrestado}" disabled="true" size="5"><f:convertNumber pattern="###,###"/></p:inputText>
+                    </p:column>
+                    <p:column  style="color: red; text-align: right">
+                        <p:outputLabel value="(-) Falta:"/></p:column>
+                    <p:column style="text-align: left">
+                        <p:inputText id="faltante" value="#{cuadreView.faltante}" disabled="true" size="5"/>
+                    </p:column>
+                </p:row>
+
+                <p:row>
+                    <p:column style="color: green; text-align: right">
+                        <p:outputLabel value="(+) Multas:"/>
+                    </p:column>
+                    <p:column style="text-align: left">
+                        <p:inputText value="#{cuadreView.cuadre.multa}" size="5"/>
+                    </p:column>
+                    <p:column  style="color: green; font-weight: bold; text-align: right">
+                        <p:outputLabel value="(+) Efectivo:"/>
+                    </p:column>
+                    <p:column style="text-align: left">
+                        <h:outputText id="efectivo" value="#{cuadreView.cuadre.efectivo}" style="color: green; font-weight: bold">
+                            <f:convertNumber pattern="###,###"/></h:outputText>
+                    </p:column>
+                    <p:column style="color: green; text-align: right">
+                        <p:outputLabel value="(+) Sobra:"/>
+                    </p:column>
+                    <p:column style="text-align: left">
+                        <p:inputText id="sobrante" value="#{cuadreView.sobrante}" disabled="true" size="5"/>
+                    </p:column>
+                </p:row>
+
+                <p:row >
+                    <p:column colspan="6">
+                        <p:dataTable value="#{cuadreView.cobrosPorRuta}" var="cpr" style="width: 50%; margin: auto; padding: 20px"  >
+                            <f:facet name="header">Cobrado por rutas</f:facet>
+                            <p:column headerText="Ruta" width="80%" style="text-align: left">
+                                #{cpr.ruta.nombre}
+                            </p:column>
+                            <p:column headerText="Monto" width="20%">
+                                <h:outputText value=" #{cpr.cobro}"><f:convertNumber pattern="###,###"/></h:outputText>
+                            </p:column>
+                        </p:dataTable>
+                    </p:column>
+                </p:row>
+
+
+                <f:facet name="footer">
+                    <p:row>
+                        <p:column  colspan="6" style="text-align: center">
+                            Cobro por día: <h:outputText value="#{cuadreView.cuadre.cobroDia}"><f:convertNumber pattern="###,###"/></h:outputText>
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column  colspan="6" style="text-align: center">
+                            Saldo actual caja menor: <h:outputText value="#{cajaMenor.saldoActual}">
+                                <f:convertNumber pattern="###,###"/></h:outputText>
+                        </p:column>
+                    </p:row>
+                    <p:row rendered="#{cajaMenor.ingreso>0 or cajaMenor.egreso>0}">
+                        <p:column  colspan="6" style="text-align: center">
+                            Saldo final caja menor:
+                            <h:outputText value="#{cajaMenor.saldoActual} + #{cajaMenor.ingreso}" rendered="#{cajaMenor.ingreso>0}"/>
+                            <h:outputText value="#{cajaMenor.saldoActual} - #{cajaMenor.egreso}" rendered="#{cajaMenor.egreso>0}"/>
+                            <h:outputText value=" = "/>
+                            <h:outputText value="#{cajaMenor.saldoFinal}">
+                                <f:convertNumber pattern="###,###"/></h:outputText>
+                            <br/>
+                            <h:outputText value="Comentario:"/><p:inputText value="#{cajaMenor.descripcion}"/>
+                        </p:column>
+                    </p:row>
+                </f:facet>
+            </p:panelGrid>
+            
+            <br/>
+            <p:commandButton value="Calcular" actionListener="#{cuadreView.calcular()}" update="pnlResumen" style=" margin: 0 auto; "/>
+        </p:panel>
+    </p:tab>
+
+</html>
+

@@ -26,12 +26,7 @@ public class AbonoBean implements Serializable {
         a.setFechaAbono(fechaAbono);
         c.getAbonoList().size();//just to instatiate
         c.getAbonoList().add(a);
-
-//        EntityManager em = JPA.getEntityManager();
-//        em.getTransaction().begin();
         em.merge(c);
-//        em.getTransaction().commit();
-//        em.close();
     }
 
 }

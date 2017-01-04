@@ -33,19 +33,28 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Cartera.findByIdCartera", query = "SELECT c FROM Cartera c WHERE c.idCartera = :idCartera"),
     @NamedQuery(name = "Cartera.findByNombre", query = "SELECT c FROM Cartera c WHERE c.nombre = :nombre")})
 public class Cartera implements Serializable {
+    
     @OneToMany(mappedBy = "idCartera")
     private List<Cuadre> cuadreList;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCartera")
     private List<BaseDia> baseDiaList;
+    
     @OneToMany(mappedBy = "idCartera")
     private List<Gasto> gastoList;
+    
+    @OneToMany(mappedBy = "idCartera")
+    private List<CajaMenor> cajaMenorList;
+    
     @OneToMany(mappedBy = "idCartera")
     private List<Ruta> rutaList;
     private static final long serialVersionUID = 1L;
+    
     @Id
     @Basic(optional = false)
     @Column(name = "ID_CARTERA")
     private Short idCartera;
+    
     @Column(name = "NOMBRE")
     private String nombre;
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCartera")
@@ -135,6 +144,15 @@ public class Cartera implements Serializable {
 
     public void setGastoList(List<Gasto> gastoList) {
         this.gastoList = gastoList;
+    }
+    
+     @XmlTransient
+    public List<CajaMenor> getCajaMenorList() {
+        return cajaMenorList;
+    }
+
+    public void setCajaMenorList(List<CajaMenor> cajaMenorList) {
+        this.cajaMenorList = cajaMenorList;
     }
 
     @XmlTransient

@@ -38,24 +38,30 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Gasto implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @Basic(optional = false)
     @GeneratedValue(generator = "GASTO_SEQ")
     @SequenceGenerator(name = "GASTO_SEQ", sequenceName = "GASTO_SEQ", allocationSize = 1, initialValue = 1)
     @Column(name = "ID_GASTO")
     private Short idGasto;
+    
     @Basic(optional = false)
     @Column(name = "FECHA_CREACION")
     @Temporal(TemporalType.DATE)
     private Date fechaCreacion;
+    
     @Basic(optional = false)
     @Column(name = "MONTO")
     private BigDecimal monto;
+    
     @Column(name = "DESCRIPCION")
     private String descripcion;
+    
     @JoinColumn(name = "ID_TIPO_GASTO", referencedColumnName = "ID_TIPO_GASTO")
     @ManyToOne(optional = false)
     private TipoGasto idTipoGasto;
+    
     @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
     @ManyToOne
     private Cartera idCartera;

@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Abono.findByFechaAbono", query = "SELECT a FROM Abono a WHERE a.fechaAbono = :fechaAbono")})
 
 public class Abono implements Serializable {
+    
     @Basic(optional = false)
     @Column(name = "MONTO")
     private BigDecimal monto;
@@ -49,10 +50,12 @@ public class Abono implements Serializable {
     @GeneratedValue(generator = "ABONO_SEQ")
     @Column(name = "ID_ABONO")
     private BigDecimal idAbono;
+    
     @Basic(optional = false)
     @Column(name = "FECHA_ABONO")
     @Temporal(TemporalType.DATE)
     private Date fechaAbono;
+    
     @JoinColumn(name = "ID_CREDITO", referencedColumnName = "ID_CREDITO")
     @ManyToOne(optional = false)
     private Credito idCredito;

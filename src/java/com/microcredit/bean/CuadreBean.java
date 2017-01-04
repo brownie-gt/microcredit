@@ -4,6 +4,7 @@ import com.microcredit.bll.CobroPorRuta;
 import com.microcredit.bll.JPA;
 import com.microcredit.dao.DetalleCredito;
 import com.microcredit.entity.Abono;
+import com.microcredit.entity.CajaMenorTipoTransaccion;
 import com.microcredit.entity.Cartera;
 import com.microcredit.entity.Credito;
 import com.microcredit.entity.Cuadre;
@@ -18,6 +19,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
@@ -46,8 +48,11 @@ public class CuadreBean implements Serializable {
     private BigDecimal totalPrestado;
     private List<CobroPorRuta> cobrosPorRuta;
 
+    private BigDecimal saldoCajaMenor;
+
     private BigDecimal totalGastos;
-    private List<Gasto> gastos;
+//    private List<Gasto> gastos;
+    private Gasto gastoSeleccionado;
     private List<TipoGasto> listTipoGasto;
     private TipoGasto tipoGastoSeleccionado;
 
@@ -66,7 +71,7 @@ public class CuadreBean implements Serializable {
 
     public CuadreBean() {
         cuadre = new Cuadre();
-        gastos = new ArrayList<>();
+//        gastos = new ArrayList<>();
     }
 
     @PostConstruct
@@ -91,10 +96,7 @@ public class CuadreBean implements Serializable {
         cuadre.setCobroDia(new BigDecimal(0));
         cuadre.setCobrado(new BigDecimal(0));
 
-        EntityManager em = JPA.getEntityManager();
-        em.getTransaction().begin();
-        List<Credito> creditos = em.createNamedQuery("Credito.findAll", Credito.class).getResultList();
-        em.close();
+        List<Credito> creditos = CreditoBean.getAllCreditos(cartera);
 
         DetalleCredito dc;
 
@@ -122,64 +124,6 @@ public class CuadreBean implements Serializable {
         }
     }
 
-    public String getTotalPrestamos() {
-        int total = 0;
-        if (creditosCuadre != null && creditosCuadre.size() > 0) {
-            for (DetalleCredito credito : creditosCuadre) {
-                total += credito.getCredito().getMonto().intValue();
-            }
-        }
-        return new DecimalFormat("###,###").format(total);
-    }
-
-    public String getTotalInteres() {
-        int total = 0;
-        if (creditosCuadre != null && creditosCuadre.size() > 0) {
-            for (DetalleCredito credito : creditosCuadre) {
-                total += credito.getInteres().intValue();
-            }
-        }
-        return new DecimalFormat("###,###").format(total);
-    }
-
-    public String getTotalAbonado() {
-        int total = 0;
-        if (creditosCuadre != null && creditosCuadre.size() > 0) {
-            for (DetalleCredito credito : creditosCuadre) {
-                total += credito.getAbonado().intValue();
-            }
-        }
-        return new DecimalFormat("###,###").format(total);
-    }
-
-    public String getTotalPorCobrar() {
-        int total = 0;
-        if (creditosCuadre != null && creditosCuadre.size() > 0) {
-            for (DetalleCredito credito : creditosCuadre) {
-                total += credito.getSaldoPorPagar().intValue();
-            }
-        }
-        return new DecimalFormat("###,###").format(total);
-    }
-
-    public void agregarGasto() {
-        if (montoGasto != null || tipoGastoSeleccionado != null) {
-            Gasto g = new Gasto();
-            g.setIdCartera(cartera);
-            g.setFechaCreacion(cuadre.getFechaCreacion());
-            g.setIdTipoGasto(tipoGastoSeleccionado);
-            g.setMonto(montoGasto);
-            g.setDescripcion(descripcionGasto);
-            if (gastosDelDia == null) {
-                gastosDelDia = new ArrayList<>();
-            }
-            gastosDelDia.add(g);
-            montoGasto = null;
-            tipoGastoSeleccionado = null;
-            descripcionGasto = null;
-        }
-    }
-
     private void ingresarGastos(EntityManager em) {
         if (gastosDelDia != null) {
             for (Gasto g : gastosDelDia) {
@@ -196,11 +140,22 @@ public class CuadreBean implements Serializable {
         }
     }
 
+    private void ingresarCajaMenor(EntityManager em) {
+        if (cajaMenor.getIngreso() != null && cajaMenor.getIngreso().intValue() > 0) {
+            cajaMenor.nuevaTransaccion(em, cartera, CajaMenorTipoTransaccion.INGRESO_EFECTIVO_CUADRE,
+                    cajaMenor.getIngreso(), cajaMenor.getDescripcion(), cuadre.getFechaCreacion());
+        } else if (cajaMenor.getEgreso() != null && cajaMenor.getEgreso().intValue() > 0) {
+            cajaMenor.nuevaTransaccion(em, cartera, CajaMenorTipoTransaccion.EGRESO_BASE_CUADRE,
+                    cajaMenor.getEgreso(), cajaMenor.getDescripcion(), cuadre.getFechaCreacion());
+        }
+    }
+
     public String ingresarCuadre() {
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
-        ingresarAbonos(em);
         ingresarGastos(em);
+        ingresarCajaMenor(em);
+        ingresarAbonos(em);
         cuadre.setIdCartera(cartera);
         em.persist(cuadre);
         em.getTransaction().commit();
@@ -220,6 +175,7 @@ public class CuadreBean implements Serializable {
 
         calcularEfectivo();
         calcularDiferencia();
+        calcularSaldoCajaMenor();
     }
 
     public void calcularEfectivo() {
@@ -317,15 +273,93 @@ public class CuadreBean implements Serializable {
     }
 
     public String onFlowProcess(FlowEvent event) {
-        if (event.getNewStep().equalsIgnoreCase("abonos") && event.getOldStep().equalsIgnoreCase("tabGastos")) {
+        if (event.getOldStep().equalsIgnoreCase("tabGastos") && event.getNewStep().equalsIgnoreCase("tabAbonos")) {
             if (creditosCuadre == null) {
                 cargarCreditos(true);
             }
-        } else if (event.getNewStep().equalsIgnoreCase("confirmacion")) {
+        } else if (event.getOldStep().equalsIgnoreCase("tabAbonos") && event.getNewStep().equalsIgnoreCase("tabResumen")) {
+            if (cuadre.getBaseDia() == null) {
+                cuadre.setBaseDia(CajaMenorBean.getUltimoEfectivoCuadre(cartera));
+            }
             calcular();
-            calcularDiferencia();
+        } else if (event.getNewStep().equalsIgnoreCase("tabConfirmacion")) {
+            calcular();
         }
         return event.getNewStep();
+    }
+
+    @ManagedProperty(value = "#{cajaMenor}")
+    private CajaMenorBean cajaMenor;
+
+    public void calcularSaldoCajaMenor() {
+        if (cuadre.getBaseDia() != null) {
+            EntityManager em = JPA.getEntityManager();
+            em.getTransaction().begin();
+            cajaMenor.calcularSaldoCajaMenor(em, cartera, cuadre.getBaseDia());
+            em.close();
+        }
+    }
+    
+    public String getTotalPrestamos() {
+        int total = 0;
+        if (creditosCuadre != null && creditosCuadre.size() > 0) {
+            for (DetalleCredito credito : creditosCuadre) {
+                total += credito.getCredito().getMonto().intValue();
+            }
+        }
+        return new DecimalFormat("###,###").format(total);
+    }
+
+    public String getTotalInteres() {
+        int total = 0;
+        if (creditosCuadre != null && creditosCuadre.size() > 0) {
+            for (DetalleCredito credito : creditosCuadre) {
+                total += credito.getInteres().intValue();
+            }
+        }
+        return new DecimalFormat("###,###").format(total);
+    }
+
+    public String getTotalAbonado() {
+        int total = 0;
+        if (creditosCuadre != null && creditosCuadre.size() > 0) {
+            for (DetalleCredito credito : creditosCuadre) {
+                total += credito.getAbonado().intValue();
+            }
+        }
+        return new DecimalFormat("###,###").format(total);
+    }
+
+    public String getTotalPorCobrar() {
+        int total = 0;
+        if (creditosCuadre != null && creditosCuadre.size() > 0) {
+            for (DetalleCredito credito : creditosCuadre) {
+                total += credito.getSaldoPorPagar().intValue();
+            }
+        }
+        return new DecimalFormat("###,###").format(total);
+    }
+
+    public void agregarGasto() {
+        if (montoGasto != null || tipoGastoSeleccionado != null) {
+            Gasto g = new Gasto();
+            g.setIdCartera(cartera);
+            g.setFechaCreacion(cuadre.getFechaCreacion());
+            g.setIdTipoGasto(tipoGastoSeleccionado);
+            g.setMonto(montoGasto);
+            g.setDescripcion(descripcionGasto);
+            if (gastosDelDia == null) {
+                gastosDelDia = new ArrayList<>();
+            }
+            gastosDelDia.add(g);
+            montoGasto = null;
+            tipoGastoSeleccionado = null;
+            descripcionGasto = null;
+        }
+    }
+
+    public void borrarGastos() {
+        gastosDelDia = null;
     }
 
     public void onRowSelect(SelectEvent event) {
@@ -397,14 +431,13 @@ public class CuadreBean implements Serializable {
         this.montoGasto = montoGasto;
     }
 
-    public List<Gasto> getGastos() {
-        return gastos;
-    }
-
-    public void setGastos(List<Gasto> gastos) {
-        this.gastos = gastos;
-    }
-
+//    public List<Gasto> getGastos() {
+//        return gastos;
+//    }
+//
+//    public void setGastos(List<Gasto> gastos) {
+//        this.gastos = gastos;
+//    }
     public List<TipoGasto> getListTipoGasto() {
         return listTipoGasto;
     }
@@ -498,5 +531,25 @@ public class CuadreBean implements Serializable {
 
     public void setIncluirCuentasPorCobrar(boolean incluirCuentasPorCobrar) {
         this.incluirCuentasPorCobrar = incluirCuentasPorCobrar;
+    }
+
+    public BigDecimal getSaldoCajaMenor() {
+        return saldoCajaMenor;
+    }
+
+    public void setSaldoCajaMenor(BigDecimal saldoCajaMenor) {
+        this.saldoCajaMenor = saldoCajaMenor;
+    }
+
+    public void setCajaMenor(CajaMenorBean cajaMenor) {
+        this.cajaMenor = cajaMenor;
+    }
+
+    public Gasto getGastoSeleccionado() {
+        return gastoSeleccionado;
+    }
+
+    public void setGastoSeleccionado(Gasto gastoSeleccionado) {
+        this.gastoSeleccionado = gastoSeleccionado;
     }
 }

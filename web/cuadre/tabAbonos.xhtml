@@ -5,7 +5,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 
-    <p:tab id="abonos" title="Abonos">
+    <p:tab id="tabAbonos" title="Abonos">
         <p:messages showDetail="true" autoUpdate="true" closable="true"/>
         
 
@@ -16,7 +16,7 @@
                 
 
             <f:facet name="header">
-                <h:outputText value="#{cuadreView.cuadre.fechaCreacion}" style="font-weight: bold; color: green;">
+                <h:outputText value="#{cuadreView.cuadre.fechaCreacion}" style="font-weight: bold; color: blue;">
                     <f:convertDateTime pattern="EEE, dd/MMM/yyyy" locale="es_GT"/></h:outputText>
             </f:facet>
 
@@ -95,10 +95,10 @@
                 <p:outputLabel value="Creditos: #{cuadreView.countCreditos}"/>
             </f:facet>
         </p:dataTable>
-
+        
         <p:defaultCommand target="marcarAbono" />
         <p:commandButton id="marcarAbono" value="Marcar Abono" actionListener="#{cuadreView.marcarAbono()}" 
-                         oncomplete="PF('wvAbonos').clearFilters()" update="dtAbonos,idCreditoFocus" >
+                         oncomplete="PF('wvAbonos').clearFilters()" update="dtAbonos,idCreditoFocus" style="display: none">
             <p:focus id="idCreditoFocus" context="formCuadre:dtAbonos:colNo"/></p:commandButton>
 
     </p:tab>
