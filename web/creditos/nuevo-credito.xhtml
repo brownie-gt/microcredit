@@ -15,8 +15,10 @@
 
         <h:form id="form">
             <p:panel id="panel" header="Nuevo Credito" >
-                <p:messages/>
-                <p:panelGrid columns="2" >
+                <p:focus context="panel"/>
+                <p:messages autoUpdate="true"/>
+                
+                <h:panelGrid columns="2" >
                     <p:outputLabel value="Ruta:" for="rutaPojo" />
                     <p:autoComplete id="rutaPojo" value="#{creditoView.ruta}" completeMethod="#{creditoView.completarRuta}"
                                     var="r" itemLabel="#{r.nombre}" itemValue="#{r}" converter="rutaConverter"  forceSelection="true" 
@@ -25,6 +27,13 @@
                             <h:outputText value="#{r.nombre} "/>
                         </p:column>
                     </p:autoComplete>
+
+                    <p:outputLabel value="Numero de tarjeta:"/>
+                    <p:column>
+                        <p:inputText id="idTarjeta" value="#{creditoView.credito.idCredito}" label="Tarjeta"/>
+                        <p:commandButton value="Cargar" actionListener="#{creditoView.cargarNuevoIdTarjeta()}" update="idTarjeta"  
+                                         process="@this,rutaPojo"/>
+                    </p:column>
 
                     <p:outputLabel value="Cliente:" for="clientePojo" />
                     <p:autoComplete id="clientePojo" value="#{creditoView.cliente}" completeMethod="#{creditoView.completarCliente}"
@@ -41,7 +50,6 @@
                         </p:column>
                     </p:autoComplete>
 
-                    <p:outputLabel value="Numero de tarjeta:"/><p:inputText value="#{creditoView.credito.idCredito}" required="true" label="Tarjeta"/>
                     <p:outputLabel value="Monto prestado:"/><p:inputText value="#{creditoView.credito.monto}" required="true" label="Monto">
                         <f:validateDoubleRange minimum="500"/>
                         <p:ajax listener="#{creditoView.calcularDetalleCredito()}" update="montoPagar,interes,cuota"/>
@@ -49,11 +57,12 @@
                     <p:outputLabel value="Interes:"/><p:inputText id="interes" value="#{creditoView.interes}" disabled="true"/>
                     <p:outputLabel value="Monto a pagar:"/><p:inputText id="montoPagar" value="#{creditoView.totalAPagar}" disabled="true"/>
                     <p:outputLabel value="Cuota:"/><p:inputText id="cuota" value="#{creditoView.cuota}" disabled="true"/>
-                    <p:outputLabel for="popup" value="Fecha desembolso:"/><p:calendar id="popup" value="#{creditoView.credito.fechaDesembolso}" 
-                                                                                      pattern="dd/MM/yyyy" required="true"/>
-                </p:panelGrid>
+                    <p:outputLabel for="idCalendar" value="Fecha desembolso:"/>
+                    <p:calendar id="idCalendar" value="#{creditoView.credito.fechaDesembolso}" 
+                                pattern="dd/MM/yyyy" required="true" disabledWeekends="true"/>
+                </h:panelGrid>
                 <p:spacer height="50px"/>
-                <p:commandButton value="Crear" action="#{creditoView.ingresarCredito()}" resetValues="true" update="panel" />
+                <p:commandButton value="Crear" actionListener="#{creditoView.ingresarCredito()}" ajax="false" update="@form" />
                 <p:commandButton value="Limpiar" actionListener="#{creditoView.limpiar()}"  resetValues="true" update="panel" process="@this"/>
             </p:panel>
         </h:form>

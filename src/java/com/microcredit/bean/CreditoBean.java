@@ -34,7 +34,6 @@ public class CreditoBean extends DetalleCredito implements Serializable {
     private Short idCartera;
     private List<Credito> creditos;
     private BigDecimal idCredito;
-//    private List<Mora> moraList;
     private Ruta ruta;
     private List<Ruta> rutas;
     private Cliente cliente;
@@ -43,8 +42,6 @@ public class CreditoBean extends DetalleCredito implements Serializable {
 
     @ManagedProperty("#{clienteService}")
     private ClienteService service;
-
-    private static final Logger logger = LoggerFactory.getLogger(CreditoBean.class);
 
     public CreditoBean() {
     }
@@ -65,21 +62,24 @@ public class CreditoBean extends DetalleCredito implements Serializable {
         return lista;
     }
 
-    public String ingresarCredito() {
-        Credito c = new Credito();
-        c.setIdCredito(getCredito().getIdCredito());
-        c.setIdCliente(cliente);
-        c.setIdRuta(ruta);
-        c.setMonto(getCredito().getMonto());
-        c.setFechaDesembolso(Utils.parsearFecha(getCredito().getFechaDesembolso()));
-        EntityManager em = JPA.getEntityManager();
-        em.getTransaction().begin();
-        em.persist(c);
-        em.getTransaction().commit();
-        em.close();
-//        creditoService.init();
-
-        return "/index";
+    public void ingresarCredito() {
+        if (!checkIfExists(getCredito().getIdCredito())) {
+            Credito c = new Credito();
+            c.setIdCredito(getCredito().getIdCredito());
+            c.setIdCliente(cliente);
+            c.setIdRuta(ruta);
+            c.setMonto(getCredito().getMonto());
+            c.setFechaDesembolso(Utils.parsearFecha(getCredito().getFechaDesembolso()));
+            EntityManager em = JPA.getEntityManager();
+            em.getTransaction().begin();
+            em.persist(c);
+            em.getTransaction().commit();
+            em.close();
+            limpiar();
+        } else {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "El numero de tarjeta ingresado ya existe", ""));
+        }
     }
 
     public void cargarCreditos() {
@@ -99,9 +99,6 @@ public class CreditoBean extends DetalleCredito implements Serializable {
     }
 
     public void cargarCreditoById() {
-        logger.debug("cargarCredito()");
-        logger.debug("idCredito: " + idCredito);
-
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
         Credito c = em.find(Credito.class, idCredito);
@@ -149,7 +146,6 @@ public class CreditoBean extends DetalleCredito implements Serializable {
     private void updateCredito(Credito c) {
         EntityManager em = JPA.getEntityManager();
         Credito temp = em.find(Credito.class, c.getIdCredito());
-
         em.getTransaction().begin();
         temp.setFechaDesembolso(c.getFechaDesembolso());
         em.getTransaction().commit();
@@ -220,6 +216,29 @@ public class CreditoBean extends DetalleCredito implements Serializable {
                 && c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR);
     }
 
+    public void cargarNuevoIdTarjeta() {
+        if (ruta != null) {
+            EntityManager em = JPA.getEntityManager();
+            em.getTransaction().begin();
+            Query query = em.createQuery("SELECT max(c.idCredito) FROM Credito c JOIN c.idRuta.idCartera cart "
+                    + "WHERE cart.idCartera = :idCartera");
+            query.setParameter("idCartera", ruta.getIdCartera().getIdCartera());
+            BigDecimal idCred = (BigDecimal) query.getSingleResult();
+            if (idCred != null) {
+                getCredito().setIdCredito(idCred.add(new BigDecimal(1)));
+            }
+            em.close();
+        }
+    }
+
+    private boolean checkIfExists(BigDecimal idCredito) {
+        EntityManager em = JPA.getEntityManager();
+        em.getTransaction().begin();
+        Credito c = em.find(Credito.class, idCredito);
+        em.close();
+        return c != null;
+    }
+    
     public BigDecimal getIdCredito() {
         return idCredito;
     }
@@ -228,13 +247,6 @@ public class CreditoBean extends DetalleCredito implements Serializable {
         this.idCredito = idCredito;
     }
 
-//    public List<Mora> getMoraList() {
-//        return moraList;
-//    }
-//
-//    public void setMoraList(List<Mora> moraList) {
-//        this.moraList = moraList;
-//    }
     public Ruta getRuta() {
         return ruta;
     }

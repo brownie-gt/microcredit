@@ -5,7 +5,6 @@
  */
 package com.microcredit.dao;
 
-import com.microcredit.bean.CreditoBean;
 import com.microcredit.entity.Abono;
 import com.microcredit.entity.Credito;
 import java.io.Serializable;

@@ -49,9 +49,9 @@ public class Cuadre implements Serializable {
     @SequenceGenerator(name = "CUADRE_SEQ", sequenceName = "CUADRE_SEQ", allocationSize = 1)
     @Column(name = "ID_CUADRE")
     private BigDecimal idCuadre;
-    @Column(name = "FECHA_CREACION")
+    @Column(name = "FECHA_CUADRE")
     @Temporal(TemporalType.DATE)
-    private Date fechaCreacion;
+    private Date fechaCuadre;
     @Column(name = "COBRO_DIA")
     private BigDecimal cobroDia;
     @Column(name = "COBRADO")
@@ -67,6 +67,10 @@ public class Cuadre implements Serializable {
     @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
     @ManyToOne
     private Cartera idCartera;
+    
+    @Column(name = "FECHA_CREACION")
+    @Temporal(TemporalType.DATE)
+    private Date fechaCreacion;
 
     public Cuadre() {
     }
@@ -83,14 +87,7 @@ public class Cuadre implements Serializable {
         this.idCuadre = idCuadre;
     }
 
-    public Date getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public void setFechaCreacion(Date fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
-
+   
     public BigDecimal getCobroDia() {
         return cobroDia;
     }
@@ -172,4 +169,21 @@ public class Cuadre implements Serializable {
         return "com.microcredit.entity.Cuadre[ idCuadre=" + idCuadre + " ]";
     }
 
+    public Date getFechaCuadre() {
+        return fechaCuadre;
+    }
+
+    public void setFechaCuadre(Date fechaCuadre) {
+        this.fechaCuadre = fechaCuadre;
+    }
+
+    public Date getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(Date fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    
 }
