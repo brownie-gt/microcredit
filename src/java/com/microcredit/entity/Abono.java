@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OrderColumn;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -33,6 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Abono.findAll", query = "SELECT a FROM Abono a"),
     @NamedQuery(name = "Abono.findByIdAbono", query = "SELECT a FROM Abono a WHERE a.idAbono = :idAbono"),
+    @NamedQuery(name = "Abono.findAbonosByIdCredito", query = "SELECT a FROM Abono a WHERE a.idCredito.idCredito = :idCredito ORDER BY a.fechaAbono"),
     @NamedQuery(name = "Abono.findByMonto", query = "SELECT a FROM Abono a WHERE a.monto = :monto"),
     @NamedQuery(name = "Abono.findByFechaAbono", query = "SELECT a FROM Abono a WHERE a.fechaAbono = :fechaAbono")})
 
@@ -59,6 +61,10 @@ public class Abono implements Serializable {
     @JoinColumn(name = "ID_CREDITO", referencedColumnName = "ID_CREDITO")
     @ManyToOne(optional = false)
     private Credito idCredito;
+    
+    @Column(name = "FECHA_CREACION", insertable=false)
+    @Temporal(TemporalType.DATE)
+    private Date fechaCreacion;
 
     public Abono() {
     }
@@ -129,6 +135,14 @@ public class Abono implements Serializable {
 
     public void setMonto(BigDecimal monto) {
         this.monto = monto;
+    }
+
+    public Date getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(Date fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
     }
 
 }

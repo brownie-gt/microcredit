@@ -15,13 +15,10 @@ import javax.persistence.Persistence;
  */
 public class JPA {
 
-    private static EntityManagerFactory emf;
+    private final static EntityManagerFactory EMF  = Persistence.createEntityManagerFactory("mcPU");
 
     public static EntityManager getEntityManager() {
-        if (emf == null) {
-            emf = Persistence.createEntityManagerFactory("mcPU");
-        }
-        return emf.createEntityManager();
+        return EMF.createEntityManager();
     }
 
 }

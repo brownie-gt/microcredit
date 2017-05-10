@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      locale="es">
+    <h:head>
+        <title>MicroCredit</title>
+    </h:head>
+    <h:body>
+        <ui:include src="/menu/menuBar.xhtml"/>
+        <p:tooltip />
+        <h:form id="form">
+            <p:messages id="msgs" showDetail="true" autoUpdate="true" closable="true" />
+
+            <p:panel id="panelCredito" header="Detalle Credito">
+                <p:focus for="idCredito"/>
+
+                <h:panelGrid columns="3">
+                    <p:outputLabel value="Numero de tarjeta:"/>
+                    <p:inputText id="idCredito" value="#{creditoView.idCredito}" />
+                    <p:commandButton value="Buscar" actionListener="#{creditoView.cargarCreditoById}" update="panelCredito" process="@this,idCredito"/>
+
+                    <p:commandButton value="Eliminar" actionListener="#{creditoView.eliminarCredito()}" update="panelCredito" process="@this,idCredito"/> <p:spacer width=""/> <p:spacer width=""/>
+
+                    <p:outputLabel for="montoAbonar" value="Monto de abono:"/>
+                    <p:inputText id="montoAbonar" value="#{creditoView.montoAbonar}" required="true" />
+                    <p:column/>
+                    <p:outputLabel for="fecha" value="Fecha de abono:"/>
+                    <p:calendar id="fecha" value="#{creditoView.fechaAbono}" pattern="dd/MM/yyyy" required="true"/>
+                    <p:commandButton value="Abonar" actionListener="#{creditoView.ingresarAbono()}" 
+                                     resetValues="true" update="panelCredito" />
+                </h:panelGrid>
+
+                <h:panelGrid columns="3" width="100%" cellpadding="20px">
+                    <p:panelGrid columns="2" style="width: 400px">
+                        <p:outputLabel value="Numero de tarjeta:"/><p:outputLabel value="#{creditoView.credito.idCredito}"/>
+                        <p:outputLabel value="Ruta:"/><p:outputLabel value="#{creditoView.credito.idRuta.nombre}"/>
+                        <p:outputLabel value="Codigo de cliente:"/>
+                        <p:outputLabel value="#{creditoView.credito.idCliente.idCliente}"/>
+                        <p:outputLabel value="Nombre:"/>
+                        <p:outputLabel value="#{creditoView.credito.idCliente.primerNombre} #{creditoView.credito.idCliente.segundoNombre}"/>
+                        <p:outputLabel value="Apellido:"/>
+                        <p:outputLabel value="#{creditoView.credito.idCliente.primerApellido} #{creditoView.credito.idCliente.segundoApellido}"/>
+                        <p:outputLabel value="Fecha desembolso:"/><p:outputLabel value="#{creditoView.credito.fechaDesembolso}">
+                            <f:convertDateTime pattern="dd/MM/yyyy" /></p:outputLabel>
+                    </p:panelGrid> 
+
+                    <p:panelGrid columns="2" style="width: 300px">   
+                        <p:outputLabel value="Monto:"/><p:outputLabel value="#{creditoView.credito.monto}" style="color: blue;"/>
+                        <p:outputLabel value="Abonado:"/><p:outputLabel value="#{creditoView.abonado}" style="color: green;"/>
+                        <p:outputLabel value="Saldo por pagar:"/><p:outputLabel value="#{creditoView.saldoPorPagar}" style="color: red;"/>
+                        <p:outputLabel value="Total a pagar:"/><p:outputLabel value="#{creditoView.totalAPagar}"/>
+                        <p:outputLabel value="Cuota:"/><p:outputLabel value="#{creditoView.cuota}"/>
+                        <p:outputLabel value="Numero de abonos:"/><p:outputLabel value="#{creditoView.numeroAbonos}"/>
+                    </p:panelGrid>
+
+                    <p:dataTable id="tbAbonos" var="abo" value="#{creditoView.abonos}" style="width: 40%"
+                                 scrollable="true" scrollHeight="150">
+                        <f:facet name="header">
+                            Abonos
+                        </f:facet>
+                        <p:column headerText="Fecha de Abono" width="65%">
+                            <h:outputText value="#{abo.fechaAbono}" >
+                                <f:convertDateTime pattern="dd-MM-yy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Monto" width="35%">
+                            <h:outputText value="#{abo.monto}" />
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+    </h:body>
+</html>
+

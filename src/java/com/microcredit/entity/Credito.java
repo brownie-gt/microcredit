@@ -7,7 +7,6 @@ package com.microcredit.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
@@ -40,41 +39,46 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Credito.findByMonto", query = "SELECT c FROM Credito c WHERE c.monto = :monto"),
     @NamedQuery(name = "Credito.findByFechaDesembolso", query = "SELECT c FROM Credito c WHERE c.fechaDesembolso = :fechaDesembolso")})
 public class Credito implements Serializable {
-    
+
     @Basic(optional = false)
     @Column(name = "MONTO")
     private BigDecimal monto;
-    
+
     @JoinColumn(name = "ID_RUTA", referencedColumnName = "ID_RUTA")
     @ManyToOne(optional = false)
     private Ruta idRuta;
-    
+
     @JoinColumn(name = "ID_CLIENTE", referencedColumnName = "ID_CLIENTE")
     @ManyToOne(optional = false)
     private Cliente idCliente;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCredito")
     private List<Mora> moraList;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCredito")
     private List<Abono> abonoList;
-    
+
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    
+
     @Id
     @Basic(optional = false)
     @Column(name = "ID_CREDITO")
     private BigDecimal idCredito;
-    
+
     @Basic(optional = false)
     @Column(name = "FECHA_DESEMBOLSO")
     @Temporal(TemporalType.DATE)
     private Date fechaDesembolso;
-//    @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
-//    @ManyToOne(optional = false)
-//    private Cartera idCartera;
 
+    @Column(name = "FECHA_VENCIMIENTO")
+    @Temporal(TemporalType.DATE)
+    private Date fechaVencimiento;
+    
+    @Column(name = "FECHA_CREACION", insertable=false)
+    @Temporal(TemporalType.DATE)
+    private Date fechaCreacion;
+    
     public Credito() {
     }
 
@@ -96,7 +100,6 @@ public class Credito implements Serializable {
         this.idCredito = idCredito;
     }
 
-
     public Date getFechaDesembolso() {
         return fechaDesembolso;
     }
@@ -112,7 +115,6 @@ public class Credito implements Serializable {
 //    public void setIdCartera(Cartera idCartera) {
 //        this.idCartera = idCartera;
 //    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -179,5 +181,21 @@ public class Credito implements Serializable {
     public void setIdRuta(Ruta idRuta) {
         this.idRuta = idRuta;
     }
-    
+
+    public Date getFechaVencimiento() {
+        return fechaVencimiento;
+    }
+
+    public void setFechaVencimiento(Date fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
+    }
+
+    public Date getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(Date fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
 }

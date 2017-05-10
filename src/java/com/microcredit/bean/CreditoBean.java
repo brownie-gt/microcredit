@@ -4,12 +4,12 @@ import com.microcredit.bll.ClienteService;
 import com.microcredit.bll.JPA;
 import com.microcredit.bll.Utils;
 import com.microcredit.dao.DetalleCredito;
+import com.microcredit.entity.Abono;
 import com.microcredit.entity.Cartera;
 import com.microcredit.entity.Cliente;
 import com.microcredit.entity.Credito;
 import com.microcredit.entity.CreditoEliminado;
 import com.microcredit.entity.Ruta;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,12 +24,11 @@ import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import org.primefaces.event.RowEditEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.primefaces.event.SelectEvent;
 
 @ManagedBean(name = "creditoView")
 @RequestScoped
-public class CreditoBean extends DetalleCredito implements Serializable {
+public class CreditoBean extends DetalleCredito {
 
     private Short idCartera;
     private List<Credito> creditos;
@@ -70,6 +69,7 @@ public class CreditoBean extends DetalleCredito implements Serializable {
             c.setIdRuta(ruta);
             c.setMonto(getCredito().getMonto());
             c.setFechaDesembolso(Utils.parsearFecha(getCredito().getFechaDesembolso()));
+            c.setFechaVencimiento(Utils.parsearFecha(getCredito().getFechaVencimiento()));
             EntityManager em = JPA.getEntityManager();
             em.getTransaction().begin();
             em.persist(c);
@@ -238,7 +238,33 @@ public class CreditoBean extends DetalleCredito implements Serializable {
         em.close();
         return c != null;
     }
-    
+
+    public List<Abono> getAbonos() {
+        EntityManager em = JPA.getEntityManager();
+        em.getTransaction().begin();
+        Query query = em.createNamedQuery("Abono.findAbonosByIdCredito", Abono.class);
+        query.setParameter("idCredito", idCredito);
+        List<Abono> abonos = query.getResultList();
+        em.close();
+        return abonos;
+    }
+
+    public List<Abono> getAbonos(BigDecimal idCredito) {
+        EntityManager em = JPA.getEntityManager();
+        em.getTransaction().begin();
+        Query query = em.createNamedQuery("Abono.findAbonosByIdCredito", Abono.class);
+        query.setParameter("idCredito", idCredito);
+        List<Abono> abonos = query.getResultList();
+        em.close();
+        return abonos;
+    }
+
+    public void dateSelect(SelectEvent event) {
+        if (getCredito().getFechaDesembolso() != null) {
+            getCredito().setFechaVencimiento(Utils.addDaysToDate(getCredito().getFechaDesembolso()));
+        }
+    }
+
     public BigDecimal getIdCredito() {
         return idCredito;
     }

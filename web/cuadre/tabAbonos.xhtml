@@ -11,25 +11,26 @@
 
         <ui:include src="/cuadre/fechaCuadre.xhtml"/>
 
-        <p:dataTable id="dtAbonos" var="credit" value="#{cuadreView.creditosCuadre}" editable="true" style="margin-bottom:20px"
+        <p:dataTable id="dtAbonos" var="credit" value="#{cuadreView.creditosCuadre}" editable="true" 
                      selection="#{cuadreView.creditosSeleccionados}" rowKey="#{credit.credito.idCredito}"
                      filteredValue="#{cuadreView.filteredCreditosCuadre}" editMode="cell" 
                      widgetVar="wvAbonos"> 
                  
+            
 
-
-            <p:column selectionMode="multiple" width="5%" style="text-align:center" />
-
-            <p:column headerText="Ruta" width="18%" sortBy="#{credit.credito.idRuta.nombre}"
+            <!-- ****************************** CHECK BOX ****************************** -->
+            <p:column selectionMode="multiple" width="3%" style="padding: 4px; text-align:center" />
+            
+            
+            <!-- ****************************** RUTA ****************************** -->
+            <p:column headerText="Ruta" width="11%" sortBy="#{credit.credito.idRuta.nombre}"
                       filterBy="#{credit.credito.idRuta.nombre}" filterMatchMode="contains">
-                <h:outputText value="#{credit.credito.idRuta.nombre}"/>
+                <h:outputText value="#{credit.credito.idRuta.nombre.length() gt 11 ? credit.credito.idRuta.nombre.substring(0,8).concat('...') : credit.credito.idRuta.nombre}"/>
+               
             </p:column>
 
-            <p:column width="10%" sortBy="#{credit.credito.fechaDesembolso}">
-                <f:facet name="header"><h:outputText value="Fecha D." title="Fecha Desembolso"/></f:facet>
-                <h:outputText value="#{credit.credito.fechaDesembolso}" ><f:convertDateTime pattern="dd/MM/yyyy"/></h:outputText>
-            </p:column>
-
+            
+            <!-- ****************************** CLIENTE ****************************** -->
             <p:column headerText="Cliente" width="36%" 
                       filterBy="#{credit.credito.idCliente.primerNombre}||#{credit.credito.idCliente.segundoNombre}||#{credit.credito.idCliente.primerApellido}||#{credit.credito.idCliente.segundoApellido}" 
                       filterMatchMode="contains" >
@@ -38,15 +39,52 @@
                 <h:outputText value=" #{credit.credito.idCliente.primerApellido}" rendered="#{not empty credit.credito.idCliente.primerApellido}"/>
                 <h:outputText value=" #{credit.credito.idCliente.segundoApellido}" rendered="#{not empty credit.credito.idCliente.segundoApellido}"/>
             </p:column>
-
+            
+            
+            <!-- ****************************** VER ABONOS ****************************** -->
+            <p:column style="width:32px;text-align: center">
+                <p:commandButton update=":formCuadre:creditDetail" oncomplete="PF('creditDialog').show()" 
+                                 icon="ui-icon-search" title="Ver Abonos"  style="width:30px;height:25px">
+                    <f:setPropertyActionListener value="#{credit}" target="#{cuadreView.creditoSeleccionado}" />
+                </p:commandButton>
+            </p:column>
+            
+            
+            <!-- ****************************** FECHA DESEMBOLSO ****************************** -->
+            <p:column width="10%" sortBy="#{credit.credito.fechaDesembolso}" style="text-align: center;">
+                <f:facet name="header">
+                    <h:outputText value="F. Desem." title="Fecha de Desembolso"/>
+                </f:facet>
+                <h:outputText id="fechaId" value="#{credit.credito.fechaDesembolso}" >
+                    <f:convertDateTime pattern="dd-MMM-yy" locale="es_GT"/>
+                </h:outputText>
+            </p:column>
+            
+            <!-- ****************************** FECHA VENCIMIENTO ****************************** -->
+            <p:column width="10%" sortBy="#{credit.credito.fechaVencimiento}" style="text-align: center; font-weight: bold; ">
+                <f:facet name="header">
+                    <h:outputText value="F. Venc." title="Fecha de Vencimiento"/>
+                </f:facet>
+                <h:outputText id="fechaVenc" value="#{credit.credito.fechaVencimiento}" >
+                    <f:convertDateTime pattern="dd-MMM-yy" locale="es_GT"/>
+                </h:outputText>
+            </p:column>
+            
+            
+            <!-- ****************************** ID CREDITO ****************************** -->
             <p:column id="colNo" filterBy="#{credit.credito.idCredito}" filterMatchMode="exact" 
                       width="7%" sortBy="#{credit.credito.idCredito}" selectRow="true" 
-                      filterValue="#{cuadreView.filterIdCredito}" filterStyle="width:80%;">
+                      filterValue="#{cuadreView.filterIdCredito}" filterStyle="width:90%;" style="text-align: center;">
                 <f:facet name="header"><h:outputText value="No." title="Numero de tarjeta"/></f:facet>
-                <h:outputText value="#{credit.credito.idCredito}" />
+                <h:outputText id="creditoId" value="#{credit.credito.idCredito}" />
             </p:column>
 
-            <p:column headerText="Cuota" width="5%" style="text-align: right;">
+            
+            <!-- ****************************** CUOTA ****************************** -->
+            <p:column width="5%" style="text-align: right;" sortBy="#{credit.cuota}">
+                 <f:facet name="header">
+                    <h:outputText value="C." title="Cuota"/>
+                </f:facet>
                 <p:cellEditor>
                     <f:facet name="output"><h:outputText value="#{credit.cuota}" >
                             <f:convertNumber pattern="###,###"/>
@@ -54,39 +92,57 @@
                     <f:facet name="input"><p:inputText id="modelInput" value="#{credit.cuota}" style="width:100%"/></f:facet>
                 </p:cellEditor>
             </p:column>
+            
 
-            <p:column width="7%" style="color: red; text-align: right;">
+            <!-- ****************************** SALDO POR COBRAR ****************************** -->
+            <p:column width="7%" style="color: red; text-align: right;" sortBy="#{credit.saldoPorPagar}">
                 <f:facet name="header"><h:outputText value="Saldo" title="Saldo por cobrar" /></f:facet>
                 <h:outputText value="#{credit.saldoPorPagar}" ><f:convertNumber pattern="###,###"/></h:outputText>
             </p:column>
-
-            <p:column width="3%" style="text-align: right;">
-                <f:facet name="header"><h:outputText value="No Ab." title="Numero de Abonos" /></f:facet>
-                <h:outputText value="#{credit.numeroAbonos}" style="text-align: right;"/>
+            
+            
+            <!-- ****************************** NUMERO DE ABONOS ****************************** -->
+            <p:column width="4%" style="color: blue; text-align: center;" sortBy="#{credit.numeroAbonos}">
+                <f:facet name="header">
+                    <h:outputText value="#" title="Numero de Abonos" />
+                </f:facet>
+                <h:outputText value="#{credit.numeroAbonos}"/>
             </p:column>
-
-            <p:column width="7%"  style="color: green; text-align: right;">
-                <f:facet name="header"><h:outputText value="Abon." title="Abonado"/></f:facet>
-                <h:outputText value="#{credit.abonado}" ><f:convertNumber pattern="###,###"/></h:outputText>
-            </p:column>
-
-            <p:column width="7%" style="text-align: right;">
-                <f:facet name="header"><h:outputText value="M. P." title="Monto Prestado" style="color: blue;"/></f:facet>
-                <h:outputText value="#{credit.credito.monto}" style="color: blue; text-align: right;">
+            
+            
+            <!-- ****************************** ABONADO ****************************** -->
+            <p:column width="7%"  style="color: green; text-align: right;" sortBy="#{credit.abonado}">
+                <f:facet name="header">
+                    <h:outputText value="Abon." title="Abonado"/>
+                </f:facet>
+                <h:outputText value="#{credit.abonado}" >
                     <f:convertNumber pattern="###,###"/>
                 </h:outputText>
             </p:column>
 
+            
+            <!-- ****************************** MONTO PRESTADO ****************************** -->
+            <p:column width="7%" style="text-align: right;" sortBy="#{credit.credito.monto}">
+                <f:facet name="header"><h:outputText value="M. P." title="Monto Prestado"/></f:facet>
+                <h:outputText value="#{credit.credito.monto}">
+                    <f:convertNumber pattern="###,###"/>
+                </h:outputText>
+            </p:column>
+            
+            
+            <!-- ****************************** INTERES ****************************** -->
             <p:column width="6%" style="text-align: right;">
                 <f:facet name="header"><h:outputText value="Int." title="Interés" /></f:facet>
-                <h:outputText value="#{credit.interes}" style="text-align: right;">
+                <h:outputText value="#{credit.interes}" >
                     <f:convertNumber pattern="###,###"/>
                 </h:outputText>
             </p:column>
 
+            
+            <!-- ****************************** FOOTER ****************************** -->
             <p:columnGroup type="footer">
                 <p:row>
-                    <p:column colspan="6" style="text-align:right" footerText="Totales:" />
+                    <p:column colspan="8" style="text-align:right" footerText="Totales:" />
                     <p:column footerText="#{cuadreView.totalPorCobrar}" />   
                     <p:column/>   
                     <p:column footerText="#{cuadreView.totalAbonado}" />
@@ -99,6 +155,8 @@
                 <p:outputLabel value="Creditos: #{cuadreView.countCreditos}"/>
             </f:facet>
         </p:dataTable>
+
+        <ui:include src="/creditos/creditDialog.xhtml"/>
 
         <p:defaultCommand target="marcarAbono" />
         <p:commandButton id="marcarAbono" value="Marcar Abono" actionListener="#{cuadreView.marcarAbono()}" 

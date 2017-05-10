@@ -29,7 +29,8 @@ public class DetalleCredito implements Serializable {
     private Credito credito;
     private boolean pagado;
 
-    private final BigDecimal tasa = new BigDecimal(0.15);
+//    private final BigDecimal tasa = new BigDecimal(0.15);
+    private final BigDecimal tasa = BigDecimal.valueOf(0.15);
     private static final int numeroCuotas = 23;
 
     public DetalleCredito() {

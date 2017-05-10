@@ -54,12 +54,21 @@
                         <f:validateDoubleRange minimum="500"/>
                         <p:ajax listener="#{creditoView.calcularDetalleCredito()}" update="montoPagar,interes,cuota"/>
                     </p:inputText>
+                   
                     <p:outputLabel value="Interes:"/><p:inputText id="interes" value="#{creditoView.interes}" disabled="true"/>
                     <p:outputLabel value="Monto a pagar:"/><p:inputText id="montoPagar" value="#{creditoView.totalAPagar}" disabled="true"/>
                     <p:outputLabel value="Cuota:"/><p:inputText id="cuota" value="#{creditoView.cuota}" disabled="true"/>
-                    <p:outputLabel for="idCalendar" value="Fecha desembolso:"/>
+                    
+                    <p:outputLabel for="idCalendar" value="Fecha Desembolso:"/>
                     <p:calendar id="idCalendar" value="#{creditoView.credito.fechaDesembolso}" 
+                                pattern="dd/MM/yyyy" disabledWeekends="true" required="true">                      
+                        <p:ajax event="dateSelect" listener="#{creditoView.dateSelect}" update="fechaVenc" process="@this"/>
+                    </p:calendar>
+                    
+                    <p:outputLabel for="fechaVenc" value="Fecha Vencimiento:"/>
+                    <p:calendar id="fechaVenc" value="#{creditoView.credito.fechaVencimiento}" 
                                 pattern="dd/MM/yyyy" required="true" disabledWeekends="true"/>
+                    
                 </h:panelGrid>
                 <p:spacer height="50px"/>
                 <p:commandButton value="Crear" actionListener="#{creditoView.ingresarCredito()}" ajax="false" update="@form" />
