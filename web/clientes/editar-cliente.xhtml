@@ -9,20 +9,31 @@
     </h:head>
     <h:body>
         <ui:include src="/menu/menuBar.xhtml"/>
-        <h:form id="formCliente">
-            <p:panel id="panel" header="Nuevo cliente">
-                <p:messages/>
-                <h:panelGrid columns="3" width="80%" id="pnlCliente">
+        <h:form id="formEditarCliente">
+            <p:messages id="msgs" showDetail="true" autoUpdate="true" closable="true" />
+
+            <p:panel id="panel" header="Editar cliente">
+                <p:focus for="idCredito"/>
+                <h:panelGrid columns="3" id="pnlCliente" style="text-align: left;">
+                    <p:outputLabel value="Numero de tarjeta:"/>
+                    <p:inputText id="idCredito" value="#{cliente.idCredito}" size="6"/>
+                    <p:commandButton value="Buscar" actionListener="#{cliente.findClienteByCreditoId()}" update="pnlEditarCliente" process="@this,idCredito"/>
+                </h:panelGrid>
+                <p:separator />
+
+                <h:panelGrid columns="3" width="80%" id="pnlEditarCliente">
                     <h:panelGrid columns="2" columnClasses="label,value">
                         <p:outputLabel for="primerNombre" value="Primer nombre:"/>
                         <p:inputText id="primerNombre" value="#{cliente.cliente.primerNombre}" required="true"/>
                         <p:outputLabel value="Segundo nombre:"/><p:inputText value="#{cliente.cliente.segundoNombre}"/>
-                        
+
                         <p:outputLabel for="pApellido" value="Primer apellido:"/>
                         <p:inputText id="pApellido" value="#{cliente.cliente.primerApellido}" required="true"/>
                         <p:outputLabel value="Segundo apellido:"/><p:inputText value="#{cliente.cliente.segundoApellido}"/>
-                        
+
                         <p:outputLabel value="DPI:"/><p:inputText value="#{cliente.cliente.dpi}" />
+                        <p:outputLabel value="Contador:"/><p:inputText value="#{cliente.cliente.contador}" />
+                        
                         <p:outputLabel value="Telefono:"/><p:inputText value="#{cliente.cliente.telefono}" />
                         <p:outputLabel value="Tipo de negocio:"/><p:inputText value="#{cliente.cliente.tipoNegocio}" />
                         <p:outputLabel value="Nit:"/><p:inputText value="#{cliente.cliente.nit}"/>
@@ -40,8 +51,8 @@
                     </h:panelGrid>
                 </h:panelGrid>
                 <p:spacer height="50px"/>
-                <p:commandButton value="Crear" actionListener="#{cliente.ingresarCliente()}" update="formCliente:panel" />
-                <p:commandButton value="Limpiar" actionListener="#{cliente.limpiar()}" update="formCliente:panel" />
+                <p:commandButton value="Editar" actionListener="#{cliente.editarCliente()}" update="formEditarCliente:panel" />
+                <p:commandButton value="Limpiar" actionListener="#{cliente.limpiar()}" update="formEditarCliente:pnlEditarCliente" />
             </p:panel>
         </h:form>
     </h:body>

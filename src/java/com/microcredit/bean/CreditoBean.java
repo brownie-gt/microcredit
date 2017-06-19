@@ -33,11 +33,14 @@ public class CreditoBean extends DetalleCredito {
     private Short idCartera;
     private List<Credito> creditos;
     private BigDecimal idCredito;
+    private BigDecimal idCreditoAntiguo;
     private Ruta ruta;
     private List<Ruta> rutas;
     private Cliente cliente;
     private BigDecimal montoAbonar;
     private Date fechaAbono;
+    private Credito oldCredit;
+    private String tipoCredito = "renovacion";
 
     @ManagedProperty("#{clienteService}")
     private ClienteService service;
@@ -57,6 +60,17 @@ public class CreditoBean extends DetalleCredito {
         Query query = em.createQuery("Select cre FROM Credito cre JOIN cre.idRuta.idCartera c WHERE c.idCartera = :idCartera");
         query.setParameter("idCartera", cartera.getIdCartera());
         List<Credito> lista = query.getResultList();
+        em.close();
+        return lista;
+    }
+
+    public static List<Object[]> getCreditosPorCobrar(Cartera cartera) {
+        EntityManager em = JPA.getEntityManager();
+        em.getTransaction().begin();
+        List<Object[]> lista = em.createQuery("SELECT c, SUM(a.monto) FROM Credito c LEFT JOIN c.abonoList a"
+                + " WHERE c.idRuta.idCartera.idCartera = :idCartera GROUP BY c HAVING ((c.monto*1.15) > SUM(a.monto) or SUM(a.monto) IS NULL)"
+                + " ORDER BY c.idCredito")
+                .setParameter("idCartera", cartera.getIdCartera()).getResultList();
         em.close();
         return lista;
     }
@@ -82,13 +96,6 @@ public class CreditoBean extends DetalleCredito {
         }
     }
 
-    public void cargarCreditos() {
-        EntityManager em = JPA.getEntityManager();
-        em.getTransaction().begin();
-        creditos = em.createNamedQuery("Credito.findAll", Credito.class).getResultList();
-        em.close();
-    }
-
     @Override
     public void limpiar() {
         super.limpiar();
@@ -96,9 +103,15 @@ public class CreditoBean extends DetalleCredito {
         ruta = null;
         montoAbonar = null;
         idCredito = null;
+        idCreditoAntiguo = null;
+        oldCredit = null;
     }
 
     public void cargarCreditoById() {
+        if (idCredito == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", "Ingrese un codigo de tarjeta."));
+            return;
+        }
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
         Credito c = em.find(Credito.class, idCredito);
@@ -112,10 +125,18 @@ public class CreditoBean extends DetalleCredito {
     }
 
     public void eliminarCredito() {
+        if (idCredito == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", "Ingrese un codigo de tarjeta."));
+            return;
+        }
+        List<Abono> abonos = getAbonos();
+        if (abonos != null && abonos.size() > 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", "Este credito ya cuenta con abonos, no es posible eliminarlo."));
+            return;
+        }
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
         Credito c = em.find(Credito.class, idCredito);
-
         CreditoEliminado ce = new CreditoEliminado();
         ce.setIdCredito(c.getIdCredito());
         ce.setIdCliente(c.getIdCliente().getIdCliente());
@@ -129,28 +150,25 @@ public class CreditoBean extends DetalleCredito {
         em.close();
     }
 
-    public void onRowEdit(RowEditEvent event) {
-        DetalleCredito dc = (DetalleCredito) event.getObject();
-        updateCredito(dc.getCredito());
-        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Credito editado", "Tarjeta: " + dc.getCredito().getIdCredito());
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-
-    }
-
-    public void onRowCancel(RowEditEvent event) {
-        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Edición cancelada", "");
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-    }
-
-    private void updateCredito(Credito c) {
-        EntityManager em = JPA.getEntityManager();
-        Credito temp = em.find(Credito.class, c.getIdCredito());
-        em.getTransaction().begin();
-        temp.setFechaDesembolso(c.getFechaDesembolso());
-        em.getTransaction().commit();
-    }
-
+    /**
+     * public void onRowEdit(RowEditEvent event) { DetalleCredito dc =
+     * (DetalleCredito) event.getObject(); updateCredito(dc.getCredito());
+     * FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Credito
+     * editado", "Tarjeta: " + dc.getCredito().getIdCredito());
+     * FacesContext.getCurrentInstance().addMessage(null, msg);
+     *
+     * }
+     *
+     * public void onRowCancel(RowEditEvent event) { FacesMessage msg = new
+     * FacesMessage(FacesMessage.SEVERITY_INFO, "Edición cancelada", "");
+     * FacesContext.getCurrentInstance().addMessage(null, msg); }
+     *
+     * private void updateCredito(Credito c) { EntityManager em =
+     * JPA.getEntityManager(); Credito temp = em.find(Credito.class,
+     * c.getIdCredito()); em.getTransaction().begin();
+     * temp.setFechaDesembolso(c.getFechaDesembolso());
+     * em.getTransaction().commit(); }*
+     */
     public static List<Credito> getCreditosByDate(Cartera cartera, Date fecha) {
         EntityManager em = JPA.getEntityManager();
         em.getTransaction().begin();
@@ -180,7 +198,8 @@ public class CreditoBean extends DetalleCredito {
         List<Cliente> allClientes = service.getClientes();
         List<Cliente> filteredClientes = new ArrayList<>();
         for (Cliente c : allClientes) {
-            if ((c.getPrimerNombre() != null && c.getPrimerNombre().toLowerCase().contains(query))
+            if ((c.getDpi()!= null && c.getDpi().contains(query))
+                    || (c.getPrimerNombre() != null && c.getPrimerNombre().toLowerCase().contains(query))
                     || (c.getSegundoNombre() != null && c.getSegundoNombre().toLowerCase().contains(query))
                     || (c.getPrimerApellido() != null && c.getPrimerApellido().toLowerCase().contains(query))
                     || (c.getSegundoApellido() != null && c.getSegundoApellido().toLowerCase().contains(query))) {
@@ -188,6 +207,24 @@ public class CreditoBean extends DetalleCredito {
             }
         }
         return filteredClientes;
+    }
+    
+     public void loadOldCredit(BigDecimal idCredito) {
+        if (idCredito == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", "Codigo de tarjeta invalido."));
+            return;
+        }
+        EntityManager em = JPA.getEntityManager();
+        em.getTransaction().begin();
+        Credito c = em.find(Credito.class, idCredito);
+        em.close();
+        if (c != null) {
+            oldCredit = c;
+            cliente = c.getIdCliente();
+            ruta = c.getIdRuta();
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Credito invalido."));
+        }
     }
 
     public List<Ruta> completarRuta(String query) {
@@ -273,6 +310,14 @@ public class CreditoBean extends DetalleCredito {
         this.idCredito = idCredito;
     }
 
+    public BigDecimal getIdCreditoAntiguo() {
+        return idCreditoAntiguo;
+    }
+
+    public void setIdCreditoAntiguo(BigDecimal idCreditoAntiguo) {
+        this.idCreditoAntiguo = idCreditoAntiguo;
+    }
+    
     public Ruta getRuta() {
         return ruta;
     }
@@ -331,5 +376,21 @@ public class CreditoBean extends DetalleCredito {
 
     public void setCreditos(List<Credito> creditos) {
         this.creditos = creditos;
+    }
+
+    public String getTipoCredito() {
+        return tipoCredito;
+    }
+
+    public void setTipoCredito(String tipoCredito) {
+        this.tipoCredito = tipoCredito;
+    }
+
+    public Credito getOldCredit() {
+        return oldCredit;
+    }
+
+    public void setOldCredit(Credito oldCredit) {
+        this.oldCredit = oldCredit;
     }
 }

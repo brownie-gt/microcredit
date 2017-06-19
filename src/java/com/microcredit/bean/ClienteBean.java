@@ -8,13 +8,17 @@ package com.microcredit.bean;
 import com.microcredit.bll.ClienteService;
 import com.microcredit.bll.JPA;
 import com.microcredit.entity.Cliente;
+import com.microcredit.entity.Credito;
 import com.microcredit.entity.ReferenciaCliente;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +37,7 @@ public class ClienteBean implements Serializable {
     private Cliente cliente = new Cliente();
     private ReferenciaCliente ref1;
     private ReferenciaCliente ref2;
+    private BigDecimal idCredito;
 
     private static final Logger logger = LoggerFactory.getLogger(ClienteBean.class);
 
@@ -69,12 +74,50 @@ public class ClienteBean implements Serializable {
         }
         return clientes;
     }
-    
-    public void limpiar(){
+
+    public void findClienteByCreditoId() {
+        if (idCredito == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", "Ingrese un codigo de tarjeta."));
+            return;
+        }
+        EntityManager em = JPA.getEntityManager();
+        em.getTransaction().begin();
+        Credito cre = em.find(Credito.class, idCredito);
+        em.close();
+        if (cre == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", "Codigo de tarjeta invalido."));
+        } else {
+            cliente = cre.getIdCliente();
+        }
+    }
+
+    public void editarCliente() {
+        EntityManager em = JPA.getEntityManager();
+        em.getTransaction().begin();
+        Cliente c = em.find(Cliente.class, cliente.getIdCliente());
+        c.setPrimerNombre(cliente.getPrimerNombre());
+        c.setSegundoNombre(cliente.getSegundoNombre());
+        c.setPrimerApellido(cliente.getPrimerApellido());
+        c.setSegundoApellido(cliente.getSegundoApellido());
+        c.setDpi(cliente.getDpi());
+        c.setContador(cliente.getContador());
+        c.setTelefono(cliente.getTelefono());
+        c.setTipoNegocio(cliente.getTipoNegocio());
+        c.setNit(cliente.getNit());
+        c.setDireccion(cliente.getDireccion());
+        c.setFechaModificacion(new Date());
+        em.getTransaction().commit();
+        em.close();
+        limpiar();
+        service.init();
+        idCredito = null;
+    }
+
+    public void limpiar() {
         cliente = new Cliente();
         ref1 = new ReferenciaCliente();
         ref2 = new ReferenciaCliente();
-    }           
+    }
 
     public void setClientes(List<Cliente> clientes) {
         this.clientes = clientes;
@@ -112,4 +155,11 @@ public class ClienteBean implements Serializable {
         this.ref2 = ref2;
     }
 
+    public BigDecimal getIdCredito() {
+        return idCredito;
+    }
+
+    public void setIdCredito(BigDecimal idCredito) {
+        this.idCredito = idCredito;
+    }
 }

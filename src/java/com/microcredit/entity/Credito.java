@@ -7,12 +7,14 @@ package com.microcredit.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -40,7 +42,6 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Credito.findByFechaDesembolso", query = "SELECT c FROM Credito c WHERE c.fechaDesembolso = :fechaDesembolso")})
 public class Credito implements Serializable {
 
-    @Basic(optional = false)
     @Column(name = "MONTO")
     private BigDecimal monto;
 
@@ -74,11 +75,14 @@ public class Credito implements Serializable {
     @Column(name = "FECHA_VENCIMIENTO")
     @Temporal(TemporalType.DATE)
     private Date fechaVencimiento;
-    
+
     @Column(name = "FECHA_CREACION", insertable=false)
     @Temporal(TemporalType.DATE)
     private Date fechaCreacion;
     
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCreditoFk")
+    private List<CreditoFalla> creditoFallaList;
+
     public Credito() {
     }
 
@@ -108,13 +112,6 @@ public class Credito implements Serializable {
         this.fechaDesembolso = fechaDesembolso;
     }
 
-//    public Cartera getIdCartera() {
-//        return idCartera;
-//    }
-//
-//    public void setIdCartera(Cartera idCartera) {
-//        this.idCartera = idCartera;
-//    }
     @Override
     public int hashCode() {
         int hash = 0;
@@ -166,13 +163,6 @@ public class Credito implements Serializable {
         this.idCliente = idCliente;
     }
 
-    public BigDecimal getMonto() {
-        return monto;
-    }
-
-    public void setMonto(BigDecimal monto) {
-        this.monto = monto;
-    }
 
     public Ruta getIdRuta() {
         return idRuta;
@@ -196,6 +186,22 @@ public class Credito implements Serializable {
 
     public void setFechaCreacion(Date fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
+    }
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
+
+    public void setMonto(BigDecimal monto) {
+        this.monto = monto;
+    }
+
+    public List<CreditoFalla> getCreditoFallaList() {
+        return creditoFallaList;
+    }
+
+    public void setCreditoFallaList(List<CreditoFalla> creditoFallaList) {
+        this.creditoFallaList = creditoFallaList;
     }
 
 }

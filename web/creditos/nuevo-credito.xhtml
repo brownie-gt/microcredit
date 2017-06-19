@@ -16,59 +16,106 @@
         <h:form id="form">
             <p:panel id="panel" header="Nuevo Credito" >
                 <p:focus context="panel"/>
-                <p:messages autoUpdate="true"/>
-                
-                <h:panelGrid columns="2" >
-                    <p:outputLabel value="Ruta:" for="rutaPojo" />
-                    <p:autoComplete id="rutaPojo" value="#{creditoView.ruta}" completeMethod="#{creditoView.completarRuta}"
-                                    var="r" itemLabel="#{r.nombre}" itemValue="#{r}" converter="rutaConverter"  forceSelection="true" 
-                                    required="false" label="Ruta">
-                        <p:column>
-                            <h:outputText value="#{r.nombre} "/>
-                        </p:column>
-                    </p:autoComplete>
+                <p:messages id="msgs" showDetail="true" autoUpdate="true" closable="true" />
+                <h:panelGrid columns="2" width="100%" >
 
-                    <p:outputLabel value="Numero de tarjeta:"/>
-                    <p:column>
-                        <p:inputText id="idTarjeta" value="#{creditoView.credito.idCredito}" label="Tarjeta"/>
-                        <p:commandButton value="Cargar" actionListener="#{creditoView.cargarNuevoIdTarjeta()}" update="idTarjeta"  
-                                         process="@this,rutaPojo"/>
-                    </p:column>
+                    <h:panelGrid id="pnlNewCredit" columns="2"  width="550px">
+                        <p:outputLabel value="Ruta:" for="rutaPojo" />
+                        <p:autoComplete id="rutaPojo" value="#{creditoView.ruta}" completeMethod="#{creditoView.completarRuta}"
+                                        var="r" itemLabel="#{r.nombre}" itemValue="#{r}" converter="rutaConverter"  forceSelection="true" 
+                                        required="false" label="Ruta">
+                            <p:column>
+                                <h:outputText value="#{r.nombre} "/>
+                            </p:column>
+                        </p:autoComplete>
 
-                    <p:outputLabel value="Cliente:" for="clientePojo" />
-                    <p:autoComplete id="clientePojo" value="#{creditoView.cliente}" completeMethod="#{creditoView.completarCliente}"
-                                    var="cli" itemLabel="#{cli.primerNombre}" itemValue="#{cli}" converter="clienteConverter"  forceSelection="true" 
-                                    required="true" label="Cliente">
+                        <p:outputLabel value="Cod. credito nuevo:"/>
                         <p:column>
-                            <h:outputText value="#{cli.idCliente} "/>
+                            <p:inputText id="idTarjeta" value="#{creditoView.credito.idCredito}" label="Tarjeta"/>
+                            <p:commandButton value="Cargar" actionListener="#{creditoView.cargarNuevoIdTarjeta()}" update="idTarjeta"  
+                                             process="@this,rutaPojo"/>
                         </p:column>
-                        <p:column>
-                            <h:outputText value="#{cli.primerNombre} " rendered="#{not empty cli.primerNombre}"/>
-                            <h:outputText value="#{cli.segundoNombre} " rendered="#{not empty cli.segundoNombre}"/>
-                            <h:outputText value="#{cli.primerApellido} " rendered="#{not empty cli.primerApellido}"/>
-                            <h:outputText value="#{cli.segundoApellido}" rendered="#{not empty cli.segundoApellido}"/>
-                        </p:column>
-                    </p:autoComplete>
 
-                    <p:outputLabel value="Monto prestado:"/><p:inputText value="#{creditoView.credito.monto}" required="true" label="Monto">
-                        <f:validateDoubleRange minimum="500"/>
-                        <p:ajax listener="#{creditoView.calcularDetalleCredito()}" update="montoPagar,interes,cuota"/>
-                    </p:inputText>
-                   
-                    <p:outputLabel value="Interes:"/><p:inputText id="interes" value="#{creditoView.interes}" disabled="true"/>
-                    <p:outputLabel value="Monto a pagar:"/><p:inputText id="montoPagar" value="#{creditoView.totalAPagar}" disabled="true"/>
-                    <p:outputLabel value="Cuota:"/><p:inputText id="cuota" value="#{creditoView.cuota}" disabled="true"/>
-                    
-                    <p:outputLabel for="idCalendar" value="Fecha Desembolso:"/>
-                    <p:calendar id="idCalendar" value="#{creditoView.credito.fechaDesembolso}" 
-                                pattern="dd/MM/yyyy" disabledWeekends="true" required="true">                      
-                        <p:ajax event="dateSelect" listener="#{creditoView.dateSelect}" update="fechaVenc" process="@this"/>
-                    </p:calendar>
-                    
-                    <p:outputLabel for="fechaVenc" value="Fecha Vencimiento:"/>
-                    <p:calendar id="fechaVenc" value="#{creditoView.credito.fechaVencimiento}" 
-                                pattern="dd/MM/yyyy" required="true" disabledWeekends="true"/>
-                    
+                        <p:outputLabel value="Monto prestado:"/><p:inputNumber value="#{creditoView.credito.monto}" required="true" label="Monto" decimalPlaces="0">
+                            <f:validateDoubleRange minimum="500"/>
+                            <p:ajax listener="#{creditoView.calcularDetalleCredito()}" update="montoPagar,interes,cuota"/>
+                        </p:inputNumber>
+
+                        <p:outputLabel value="Interes:"/><p:inputText id="interes" value="#{creditoView.interes}" disabled="true"/>
+                        <p:outputLabel value="Monto a pagar:"/><p:inputText id="montoPagar" value="#{creditoView.totalAPagar}" disabled="true"/>
+                        <p:outputLabel value="Cuota:"/><p:inputText id="cuota" value="#{creditoView.cuota}" disabled="true"/>
+
+                        <p:outputLabel for="idCalendar" value="Fecha Desembolso:"/>
+                        <p:calendar id="idCalendar" value="#{creditoView.credito.fechaDesembolso}" 
+                                    pattern="dd/MM/yyyy" disabledWeekends="true" required="true">                      
+                            <p:ajax event="dateSelect" listener="#{creditoView.dateSelect}" update="fechaVenc" process="@this"/>
+                        </p:calendar>
+
+                        <p:outputLabel for="fechaVenc" value="Fecha Vencimiento:"/>
+                        <p:calendar id="fechaVenc" value="#{creditoView.credito.fechaVencimiento}" 
+                                    pattern="dd/MM/yyyy" required="true" disabledWeekends="true"/>
+
+                    </h:panelGrid>
+
+
+                    <!-- ****************** PANEL CREDITO ANTIGUO ******************-->
+                    <h:panelGrid columns="2"  id="panelCreditoAntiguo" 
+                                 width="700px">
+
+                        <!--  NUEVO CREDITO -->
+                        <p:outputLabel value="Cliente:" for="clientePojo" />
+                        <p:autoComplete id="clientePojo" value="#{creditoView.cliente}" completeMethod="#{creditoView.completarCliente}"
+                                        var="cli" itemLabel="#{cli.primerNombre}" itemValue="#{cli}" converter="clienteConverter"  forceSelection="true" 
+                                        required="true" label="Cliente" title="Credito nuevo" requiredMessage="Ingrese un cliente.">
+                            <p:column>
+                                <h:outputText value="#{cli.dpi} "/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{cli.primerNombre} " rendered="#{not empty cli.primerNombre}"/>
+                                <h:outputText value="#{cli.segundoNombre} " rendered="#{not empty cli.segundoNombre}"/>
+                                <h:outputText value="#{cli.primerApellido} " rendered="#{not empty cli.primerApellido}"/>
+                                <h:outputText value="#{cli.segundoApellido}" rendered="#{not empty cli.segundoApellido}"/>
+                            </p:column>
+                            <p:ajax event="itemSelect" update="panelCreditoAntiguo" />
+                        </p:autoComplete>
+
+                        <!--  RENOVACION -->
+                        <p:outputLabel value="Cod. de credito antiguo:"/>
+                        <p:column>
+                            <p:inputText id="idCodigoCreditoAntiguo" value="#{creditoView.idCreditoAntiguo}" title="Renovación"/>
+                            <p:commandButton value="Cargar" actionListener="#{creditoView.loadOldCredit(creditoView.idCreditoAntiguo)}" update="panelCreditoAntiguo,pnlNewCredit"  
+                                             process="idCodigoCreditoAntiguo,@this"/>
+                        </p:column>
+                        <p:outputLabel value="Monto:"/>
+                        <p:inputNumber value="#{creditoView.oldCredit.monto}" disabled="true" decimalPlaces="0"/>
+
+
+                        <!--  DETALLES CLIENTE EXISTENTE -->
+                        <p:outputLabel value="Nombre:"/>
+                        <p:column>
+                            <p:inputText value="#{creditoView.oldCredit.idCliente.primerNombre}" disabled="true"/>
+                            <p:inputText value="#{creditoView.oldCredit.idCliente.segundoNombre}" disabled="true"/>
+                        </p:column>
+                        <p:outputLabel value="Apellido:"/>
+                        <p:column>
+                            <p:inputText value="#{creditoView.oldCredit.idCliente.primerApellido}" disabled="true"/>
+                            <p:inputText value="#{creditoView.oldCredit.idCliente.segundoApellido}" disabled="true"/>
+                        </p:column>
+                        <p:outputLabel value="DPI:"/>
+                        <p:inputText value="#{creditoView.oldCredit.idCliente.dpi}" disabled="true"/>
+
+
+                        <!--  DETALLES CREDITO EXISTENTE -->
+                        <p:outputLabel value="Fecha desembolso:"/>
+                        <p:inputText value="#{creditoView.oldCredit.fechaDesembolso}" disabled="true">
+                            <f:convertDateTime pattern="dd-MMM-yy" locale="es_GT"/></p:inputText>
+                        <p:outputLabel value="Fecha de vencimiento:"/>
+                        <p:inputText value="#{creditoView.oldCredit.fechaVencimiento}" disabled="true">
+                            <f:convertDateTime pattern="dd-MMM-yy" locale="es_GT"/></p:inputText>
+
+
+                    </h:panelGrid>
+
                 </h:panelGrid>
                 <p:spacer height="50px"/>
                 <p:commandButton value="Crear" actionListener="#{creditoView.ingresarCredito()}" ajax="false" update="@form" />

@@ -27,17 +27,18 @@
             </h:panelGrid>
             <p:spacer height=""/>
 
-            <p:dataTable id="dtGastos" var="gast" value="#{cuadreView.gastosDelDia}">
+
+            <p:dataTable id="dtGastos" var="gast" value="#{cuadreView.gastosDelDia}" style="width: 80%;">
                 <f:facet name="header">
                     Gastos
                 </f:facet>
-                <p:column headerText="Monto">
+                <p:column headerText="Monto" width="10%">
                     <h:outputText value="#{gast.monto}" />
                 </p:column>
-                <p:column headerText="Tipo">
+                <p:column headerText="Tipo" width="35%">
                     <h:outputText value="#{gast.idTipoGasto.descripcion}" />
                 </p:column>
-                <p:column headerText="Descripción">
+                <p:column headerText="Descripción" width="55%">
                     <h:outputText value="#{gast.descripcion}" />
                 </p:column>
             </p:dataTable>

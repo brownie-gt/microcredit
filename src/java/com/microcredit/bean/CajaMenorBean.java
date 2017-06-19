@@ -51,10 +51,6 @@ public class CajaMenorBean implements Serializable {
         em.persist(trx);
     }
 
-    public void nuevoEgreso(Cartera cartera, CajaMenor cm) {
-
-    }
-
     public void calcularSaldoCajaMenor(EntityManager em, Cartera cartera, BigDecimal base) {
         BigDecimal efectivoUltimoCuadre = getUltimoEfectivo(em, cartera);
         ingreso = new BigDecimal(0);
@@ -89,14 +85,14 @@ public class CajaMenorBean implements Serializable {
         return BigDecimal.ZERO;
     }
 
-    public static BigDecimal getUltimoEfectivoCuadre(Cartera cartera) {
+    public static BigDecimal getBaseDiaSiguiente(Cartera cartera) {
         EntityManager em = JPA.getEntityManager();
         Query query = em.createNamedQuery("Cuadre.findLastCuadre", Cuadre.class);
         query.setParameter("idCartera", cartera.getIdCartera());
         query.setMaxResults(1);
         List<Cuadre> cuadreList = query.getResultList();
         if (!cuadreList.isEmpty()) {
-            return cuadreList.get(0).getEfectivo();
+            return cuadreList.get(0).getBaseDiaSiguiente();
         }
         em.close();
         return BigDecimal.ZERO;

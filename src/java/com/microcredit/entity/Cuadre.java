@@ -60,6 +60,8 @@ public class Cuadre implements Serializable {
     private BigDecimal cobroCobrador;
     @Column(name = "BASE_DIA")
     private BigDecimal baseDia;
+    @Column(name = "BASE_DIA_SIGUIENTE")
+    private BigDecimal baseDiaSiguiente;
     @Column(name = "EFECTIVO")
     private BigDecimal efectivo;
     @Column(name = "MULTA")
@@ -67,8 +69,8 @@ public class Cuadre implements Serializable {
     @JoinColumn(name = "ID_CARTERA", referencedColumnName = "ID_CARTERA")
     @ManyToOne
     private Cartera idCartera;
-    
-    @Column(name = "FECHA_CREACION")
+
+    @Column(name = "FECHA_CREACION", insertable = false)
     @Temporal(TemporalType.DATE)
     private Date fechaCreacion;
 
@@ -87,7 +89,6 @@ public class Cuadre implements Serializable {
         this.idCuadre = idCuadre;
     }
 
-   
     public BigDecimal getCobroDia() {
         return cobroDia;
     }
@@ -120,6 +121,14 @@ public class Cuadre implements Serializable {
         this.baseDia = baseDia;
     }
 
+    public BigDecimal getBaseDiaSiguiente() {
+        return baseDiaSiguiente;
+    }
+
+    public void setBaseDiaSiguiente(BigDecimal baseDiaSiguiente) {
+        this.baseDiaSiguiente = baseDiaSiguiente;
+    }
+
     public BigDecimal getEfectivo() {
         return efectivo;
     }
@@ -135,7 +144,7 @@ public class Cuadre implements Serializable {
     public void setMulta(BigDecimal multa) {
         this.multa = multa;
     }
-    
+
     public Cartera getIdCartera() {
         return idCartera;
     }
@@ -185,5 +194,4 @@ public class Cuadre implements Serializable {
         this.fechaCreacion = fechaCreacion;
     }
 
-    
 }

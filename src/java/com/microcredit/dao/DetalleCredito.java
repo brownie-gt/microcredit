@@ -22,23 +22,24 @@ public class DetalleCredito implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(DetalleCredito.class);
     private BigDecimal interes;
     private BigDecimal cuota;
+    private BigDecimal cuotaRequerida;
     private int numeroAbonos;
     private BigDecimal abonado;
     private BigDecimal saldoPorPagar;
     private BigDecimal totalAPagar;
     private Credito credito;
     private boolean pagado;
+    private boolean falla;
 
 //    private final BigDecimal tasa = new BigDecimal(0.15);
     private final BigDecimal tasa = BigDecimal.valueOf(0.15);
-    private static final int numeroCuotas = 23;
+    private static final int NUMERO_DE_CUOTAS = 23;
 
     public DetalleCredito() {
-        this.credito = new Credito();
     }
-
+    
     public DetalleCredito(Credito credito) {
-        this.credito = new Credito();
+        this.credito = credito;
     }
 
     public void calcularDetalleCredito() {
@@ -78,13 +79,10 @@ public class DetalleCredito implements Serializable {
     private void calcularCuota() {
         if (totalAPagar.compareTo(abonado) <= 0) {
             cuota = new BigDecimal(0);
+            cuotaRequerida = new BigDecimal(0);
             pagado = true;
         } else {
-//            if (CreditoBean.isDesembolsoDeHoy(credito.getFechaDesembolso())) {
-//                cuota = new BigDecimal(0);
-//            } else {
-                cuota = totalAPagar.divide(new BigDecimal(numeroCuotas)).setScale(0, RoundingMode.HALF_EVEN);
-//            }
+            cuotaRequerida = cuota = totalAPagar.divide(new BigDecimal(NUMERO_DE_CUOTAS)).setScale(0, RoundingMode.HALF_EVEN);
             pagado = false;
         }
     }
@@ -164,4 +162,19 @@ public class DetalleCredito implements Serializable {
         this.numeroAbonos = numeroAbonos;
     }
 
+    public boolean isFalla() {
+        return falla;
+    }
+
+    public void setFalla(boolean falla) {
+        this.falla = falla;
+    }
+
+    public BigDecimal getCuotaRequerida() {
+        return cuotaRequerida;
+    }
+
+    public void setCuotaRequerida(BigDecimal cuotaRequerida) {
+        this.cuotaRequerida = cuotaRequerida;
+    }
 }

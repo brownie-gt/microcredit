@@ -19,12 +19,20 @@
     <class>com.microcredit.entity.CajaMenorTipoTransaccion</class>
     <class>com.microcredit.entity.CreditosEliminados</class>
     <class>com.microcredit.entity.CreditoEliminado</class>
+    <class>com.microcredit.entity.CreditosPorCobrar</class>
+    <class>com.microcredit.entity.CreditoFalla</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
+      <!--****************** TEST ******************-->
       <property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@localhost:1521:XE"/>
-      <property name="javax.persistence.jdbc.password" value="fullmoon222"/>
-      <property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/>
+      <!--<property name="javax.persistence.jdbc.user" value="mc_t"/>-->
+      <!--****************** PRO ******************-->
       <property name="javax.persistence.jdbc.user" value="mc_p"/>
+      <!--****************** REMOTE ******************-->
+      <!--<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@192.168.0.13:1521:XE"/>-->
+      <!--<property name="javax.persistence.jdbc.user" value="mc_p"/>-->
+      <property name="javax.persistence.jdbc.password" value="fullmoon111"/>
+      <property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/>
       <property name="javax.persistence.schema-generation.database.action" value="none"/>
     </properties>
   </persistence-unit>

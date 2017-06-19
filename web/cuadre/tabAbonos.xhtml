@@ -10,6 +10,7 @@
         <p:messages showDetail="true" autoUpdate="true" closable="true"/>
 
         <ui:include src="/cuadre/fechaCuadre.xhtml"/>
+        <p:focus id="idCreditoFocus" context="formCuadre:dtAbonos:colNo"/>
 
         <p:dataTable id="dtAbonos" var="credit" value="#{cuadreView.creditosCuadre}" editable="true" 
                      selection="#{cuadreView.creditosSeleccionados}" rowKey="#{credit.credito.idCredito}"
@@ -24,14 +25,14 @@
             
             <!-- ****************************** RUTA ****************************** -->
             <p:column headerText="Ruta" width="11%" sortBy="#{credit.credito.idRuta.nombre}"
-                      filterBy="#{credit.credito.idRuta.nombre}" filterMatchMode="contains">
+                      filterBy="#{credit.credito.idRuta.nombre}" filterMatchMode="contains" filterStyle="width:90%;">
                 <h:outputText value="#{credit.credito.idRuta.nombre.length() gt 11 ? credit.credito.idRuta.nombre.substring(0,8).concat('...') : credit.credito.idRuta.nombre}"/>
                
             </p:column>
 
             
             <!-- ****************************** CLIENTE ****************************** -->
-            <p:column headerText="Cliente" width="36%" 
+            <p:column headerText="Cliente" width="33%" 
                       filterBy="#{credit.credito.idCliente.primerNombre}||#{credit.credito.idCliente.segundoNombre}||#{credit.credito.idCliente.primerApellido}||#{credit.credito.idCliente.segundoApellido}" 
                       filterMatchMode="contains" >
                 <h:outputText value="#{credit.credito.idCliente.primerNombre}" rendered="#{not empty credit.credito.idCliente.primerNombre}"/>
@@ -65,7 +66,8 @@
                 <f:facet name="header">
                     <h:outputText value="F. Venc." title="Fecha de Vencimiento"/>
                 </f:facet>
-                <h:outputText id="fechaVenc" value="#{credit.credito.fechaVencimiento}" >
+                <h:outputText id="fechaVenc" value="#{credit.credito.fechaVencimiento}" 
+                              style="color: #{cuadreView.todaysDate gt credit.credito.fechaVencimiento ? 'red' : ''};" >
                     <f:convertDateTime pattern="dd-MMM-yy" locale="es_GT"/>
                 </h:outputText>
             </p:column>
@@ -91,6 +93,19 @@
                         </h:outputText></f:facet>
                     <f:facet name="input"><p:inputText id="modelInput" value="#{credit.cuota}" style="width:100%"/></f:facet>
                 </p:cellEditor>
+            </p:column>
+            
+            
+            <!-- ****************************** FALLAS ****************************** -->
+            <p:column  width="3%" style="text-align: center; padding: 4px;">
+                <f:facet name="header">
+                    <h:outputText value="F." title="Falla"/>
+                </f:facet>
+                <p:selectBooleanCheckbox value="#{credit.falla}">
+                    <p:ajax listener="#{cuadreView.removerCuota(credit)}" oncomplete="PF('wvAbonos').clearFilters();"
+                            update="dtAbonos,:formCuadre:idCreditoFocus"/>
+
+                </p:selectBooleanCheckbox>
             </p:column>
             
 
@@ -142,7 +157,7 @@
             <!-- ****************************** FOOTER ****************************** -->
             <p:columnGroup type="footer">
                 <p:row>
-                    <p:column colspan="8" style="text-align:right" footerText="Totales:" />
+                    <p:column colspan="9" style="text-align:right" footerText="Totales:" />
                     <p:column footerText="#{cuadreView.totalPorCobrar}" />   
                     <p:column/>   
                     <p:column footerText="#{cuadreView.totalAbonado}" />
@@ -160,8 +175,7 @@
 
         <p:defaultCommand target="marcarAbono" />
         <p:commandButton id="marcarAbono" value="Marcar Abono" actionListener="#{cuadreView.marcarAbono()}" 
-                         oncomplete="PF('wvAbonos').clearFilters()" update="dtAbonos,idCreditoFocus" style="display: none">
-            <p:focus id="idCreditoFocus" context="formCuadre:dtAbonos:colNo"/></p:commandButton>
+                         oncomplete="PF('wvAbonos').clearFilters()" update="dtAbonos,idCreditoFocus" style="display: none"/>
 
     </p:tab>
 

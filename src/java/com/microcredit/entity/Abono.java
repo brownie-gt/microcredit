@@ -17,7 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OrderColumn;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -40,10 +39,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 public class Abono implements Serializable {
     
-    @Basic(optional = false)
-    @Column(name = "MONTO")
-    private BigDecimal monto;
-
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id
@@ -52,6 +47,10 @@ public class Abono implements Serializable {
     @GeneratedValue(generator = "ABONO_SEQ")
     @Column(name = "ID_ABONO")
     private BigDecimal idAbono;
+    
+    @Basic(optional = false)
+    @Column(name = "MONTO")
+    private BigDecimal monto;
     
     @Basic(optional = false)
     @Column(name = "FECHA_ABONO")

@@ -92,11 +92,26 @@
 
 
                 <f:facet name="footer">
+                    <p:row>
+                        <p:column  colspan="6" style="text-align: center">
+                            Base día siguiente:                                                               
+                            <p:inputNumber value="#{cuadreView.cuadre.baseDiaSiguiente}" decimalPlaces="0" size="5" maxValue="100000"
+                                           required="true" requiredMessage="Base del día siguiente es requerida"/>
+                        </p:column>
+                    </p:row>
 
                     <p:row>
-                        <p:column colspan="6" style="text-align: center">
-                            Porcentaje de cumplimiento: <h:outputText value="#{cuadreView.porcentajeCumplimiento}">
+                        <p:column colspan="6" style="text-align: center;">
+                            Cumplimiento: <h:outputText value="#{cuadreView.porcentajeCumplimiento}">
                                 <f:convertNumber pattern="###.##"/></h:outputText> %
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column colspan="6" style="text-align: center;">
+                            <h:outputText value="#{cuadreView.countFallas} Fallas &#160;| "/> 
+                            Total: <h:outputText value="#{cuadreView.totalFallas}">
+                                <f:convertNumber pattern="###.##"/></h:outputText> 
                         </p:column>
                     </p:row>
 

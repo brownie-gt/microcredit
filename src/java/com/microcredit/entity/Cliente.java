@@ -48,6 +48,9 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Cliente.findByEstado", query = "SELECT c FROM Cliente c WHERE c.estado = :estado")})
 @SequenceGenerator(name = "CLIENTE_SEQ", sequenceName = "CLIENTE_SEQ", allocationSize = 1)
 public class Cliente implements Serializable {
+
+    @Column(name = "ESTADO")
+    private Integer estado;
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -79,12 +82,13 @@ public class Cliente implements Serializable {
     @Column(name = "FECHA_MODIFICACION")
     @Temporal(TemporalType.DATE)
     private Date fechaModificacion;
-    @Column(name = "ESTADO")
-    private Short estado;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente")
     private List<Credito> creditoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCliente")
     private List<ReferenciaCliente> referenciaClienteList;
+    
+    @Column(name = "CONTADOR")
+    private String contador;
 
     public Cliente() {
     }
@@ -194,14 +198,15 @@ public class Cliente implements Serializable {
         this.fechaModificacion = fechaModificacion;
     }
 
-    public Short getEstado() {
-        return estado;
+
+    public String getContador() {
+        return contador;
     }
 
-    public void setEstado(Short estado) {
-        this.estado = estado;
+    public void setContador(String contador) {
+        this.contador = contador;
     }
-
+    
     @XmlTransient
     public List<Credito> getCreditoList() {
         return creditoList;
@@ -243,6 +248,14 @@ public class Cliente implements Serializable {
     @Override
     public String toString() {
         return "com.microcredit.entity.Cliente[ idCliente=" + idCliente + " ]";
+    }
+
+    public Integer getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Integer estado) {
+        this.estado = estado;
     }
     
 }

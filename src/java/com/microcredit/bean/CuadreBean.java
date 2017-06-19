@@ -1,6 +1,7 @@
 package com.microcredit.bean;
 
 import com.microcredit.bll.CobroPorRuta;
+import com.microcredit.bll.Falla;
 import com.microcredit.bll.JPA;
 import com.microcredit.bll.SendMail;
 import com.microcredit.dao.DetalleCredito;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -50,6 +52,8 @@ public class CuadreBean implements Serializable {
     private List<CobroPorRuta> cobrosPorRuta;
 
     private BigDecimal saldoCajaMenor;
+    private BigDecimal totalFallas;
+    private int countFallas;
 
     private BigDecimal totalGastos;
 //    private List<Gasto> gastos;
@@ -63,11 +67,14 @@ public class CuadreBean implements Serializable {
 
     private String filterIdCredito;
     private List<DetalleCredito> creditosSeleccionados;
+    private DetalleCredito creditoSeleccionado;
     private int countCreditosSeleccionados;
     private int countCreditos;
 
+    private Date todaysDate = new Date();
+
     private boolean incluirCuentasPorCobrar;
-    
+
     private static final Logger logger = LoggerFactory.getLogger(CreditoBean.class);
 
     public CuadreBean() {
@@ -102,8 +109,7 @@ public class CuadreBean implements Serializable {
         DetalleCredito dc;
 
         for (Credito c : creditos) {
-            dc = new DetalleCredito();
-            dc.setCredito(c);
+            dc = new DetalleCredito(c);
             dc.calcularDetalleCredito();
             if (calcularCobros && !dc.isPagado()) {
                 if (CreditoBean.isNuevoCredito(dc.getCredito().getFechaDesembolso(), cuadre.getFechaCuadre())) {
@@ -125,6 +131,32 @@ public class CuadreBean implements Serializable {
         }
     }
 
+    public void cargarCreditosPorCobrar(boolean calcularCobros) {
+        creditosCuadre = new ArrayList<>();
+        totalPrestado = new BigDecimal(0);
+        cuadre.setCobroDia(new BigDecimal(0));
+        cuadre.setCobrado(new BigDecimal(0));
+        DetalleCredito dc;
+        List<Object[]> results = CreditoBean.getCreditosPorCobrar(cartera);
+
+        for (Object[] result : results) {
+            Credito c = (Credito) result[0];
+            dc = new DetalleCredito(c);
+            dc.calcularDetalleCredito();
+            if (CreditoBean.isNuevoCredito(dc.getCredito().getFechaDesembolso(), cuadre.getFechaCuadre())) {
+                dc.setCuota(new BigDecimal(0));
+            } else {
+                cuadre.setCobroDia(cuadre.getCobroDia().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
+            }
+            cuadre.setCobrado(cuadre.getCobrado().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
+            creditosCuadre.add(dc);
+        }
+        if (results != null) {
+            countCreditos = results.size();
+        }
+
+    }
+
     private void ingresarGastos(EntityManager em) {
         if (gastosDelDia != null) {
             for (Gasto g : gastosDelDia) {
@@ -137,6 +169,8 @@ public class CuadreBean implements Serializable {
         for (DetalleCredito dc : creditosCuadre) {
             if (dc.getCuota() != null && dc.getCuota().intValue() > 0) {
                 AbonoBean.ingresarAbono(em, dc.getCredito(), dc.getCuota(), cuadre.getFechaCuadre());
+            } else if (dc.getCuota() != null && dc.isFalla()) {
+                Falla.ingresarFalla(em, dc.getCredito(), dc.getCuota(), cuadre.getFechaCuadre());
             }
         }
     }
@@ -216,10 +250,15 @@ public class CuadreBean implements Serializable {
     private void calcularCobrado() {
         inicializarCobroPorRutas();
         cuadre.setCobrado(new BigDecimal(0));
+        totalFallas = new BigDecimal(0);
+        countFallas = 0;
         for (DetalleCredito dc : creditosCuadre) {
             if (dc.getCuota() != null && dc.getCuota().intValue() > 0) {
                 cuadre.setCobrado(cuadre.getCobrado().add(dc.getCuota()).setScale(0, RoundingMode.HALF_EVEN));
                 calcularCobradoPorRuta(dc);
+            } else if (dc.isFalla()) {
+                totalFallas = totalFallas.add(dc.getCuotaRequerida()).setScale(0, RoundingMode.HALF_EVEN);
+                countFallas++;
             }
         }
     }
@@ -259,29 +298,34 @@ public class CuadreBean implements Serializable {
     }
 
     public void marcarAbono() {
-        if (filterIdCredito != null && filterIdCredito.length() > 0) {
-            try {
-                for (DetalleCredito dc : creditosCuadre) {
-                    if (dc.getCredito().getIdCredito().intValue() == Integer.valueOf(filterIdCredito)) {
-                        getCreditosSeleccionados().add(dc);
-                        filterIdCredito = "";
-                        break;
-                    }
-                }
-            } catch (NumberFormatException e) {
-                logger.warn("Id filtro incorrecto", e);
-            }
+//        if (filterIdCredito != null && filterIdCredito.length() > 0) {
+//            try {
+//                for (DetalleCredito dc : creditosCuadre) {
+//                    if (dc.getCredito().getIdCredito().intValue() == Integer.parseInt(filterIdCredito)) {
+//                        getCreditosSeleccionados().add(dc);
+//                        filterIdCredito = "";
+//                        break;
+//                    }
+//                }
+//            } catch (NumberFormatException e) {
+//                logger.warn("Id filtro incorrecto", e);
+//            }
+//        }
+
+        if (filteredCreditosCuadre != null & filteredCreditosCuadre.size() == 1) {
+            creditosSeleccionados.add(filteredCreditosCuadre.get(0));
         }
     }
 
     public String onFlowProcess(FlowEvent event) {
         if (event.getOldStep().equalsIgnoreCase("tabGastos") && event.getNewStep().equalsIgnoreCase("tabAbonos")) {
             if (creditosCuadre == null) {
-                cargarCreditos(true);
+                cargarCreditosPorCobrar(true);
+//                cargarCreditos(true);
             }
         } else if (event.getOldStep().equalsIgnoreCase("tabAbonos") && event.getNewStep().equalsIgnoreCase("tabResumen")) {
             if (cuadre.getBaseDia() == null) {
-                cuadre.setBaseDia(CajaMenorBean.getUltimoEfectivoCuadre(cartera));
+                cuadre.setBaseDia(CajaMenorBean.getBaseDiaSiguiente(cartera));
             }
             calcular();
         } else if (event.getNewStep().equalsIgnoreCase("tabConfirmacion")) {
@@ -301,7 +345,7 @@ public class CuadreBean implements Serializable {
             em.close();
         }
     }
-    
+
     public String getTotalPrestamos() {
         int total = 0;
         if (creditosCuadre != null && creditosCuadre.size() > 0) {
@@ -343,7 +387,7 @@ public class CuadreBean implements Serializable {
     }
 
     public void agregarGasto() {
-        if (montoGasto != null || tipoGastoSeleccionado != null) {
+        if (montoGasto != null && tipoGastoSeleccionado != null) {
             Gasto g = new Gasto();
             g.setIdCartera(cartera);
             g.setFechaCreacion(cuadre.getFechaCuadre());
@@ -357,11 +401,33 @@ public class CuadreBean implements Serializable {
             montoGasto = null;
             tipoGastoSeleccionado = null;
             descripcionGasto = null;
+        } else if (tipoGastoSeleccionado == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", "Tipo requerido"));
+        } else if (montoGasto == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", "Monto requerido"));
         }
+
+    }
+
+    public List<Abono> getAbonosCreditoSeleccionado() {
+        if (getCreditoSeleccionado() != null) {
+            List<Abono> abonosList;
+            abonosList = new CreditoBean().getAbonos(getCreditoSeleccionado().getCredito().getIdCredito());
+            return abonosList;
+        }
+        return null;
     }
 
     public void borrarGastos() {
         gastosDelDia = null;
+    }
+
+    public void removerCuota(DetalleCredito dc) {
+        dc.setCuota(BigDecimal.ZERO);
+        if (getCreditosSeleccionados() != null) {
+            getCreditosSeleccionados().add(dc);
+        }
+        filterIdCredito = "";
     }
 
     public void onRowSelect(SelectEvent event) {
@@ -378,6 +444,7 @@ public class CuadreBean implements Serializable {
     public void onRowCancel(RowEditEvent event) {
     }
 
+    //************* GETTERS AND SETTERS ***************//
     public List<Abono> getAbonos() {
         return abonos;
     }
@@ -556,7 +623,42 @@ public class CuadreBean implements Serializable {
     }
 
     public BigDecimal getPorcentajeCumplimiento() {
-        return (cuadre.getCobrado().divide(cuadre.getCobroDia(),2, RoundingMode.HALF_UP)).multiply(new BigDecimal(100));
-    }   
-    
+        if (cuadre.getCobrado() != null && cuadre.getCobrado().intValue() > 0 && cuadre.getCobroDia() != null && cuadre.getCobroDia().intValue() > 0) {
+            return (cuadre.getCobrado().divide(cuadre.getCobroDia(), 2, RoundingMode.HALF_UP)).multiply(new BigDecimal(100));
+        }
+        return BigDecimal.ZERO;
+    }
+
+    public DetalleCredito getCreditoSeleccionado() {
+        return creditoSeleccionado;
+    }
+
+    public void setCreditoSeleccionado(DetalleCredito creditoSeleccionado) {
+        this.creditoSeleccionado = creditoSeleccionado;
+    }
+
+    public Date getTodaysDate() {
+        return todaysDate;
+    }
+
+    public void setTodaysDate(Date todaysDate) {
+        this.todaysDate = todaysDate;
+    }
+
+    public BigDecimal getTotalFallas() {
+        return totalFallas;
+    }
+
+    public void setTotalFallas(BigDecimal totalFallas) {
+        this.totalFallas = totalFallas;
+    }
+
+    public int getCountFallas() {
+        return countFallas;
+    }
+
+    public void setCountFallas(int countFallas) {
+        this.countFallas = countFallas;
+    }
+
 }
